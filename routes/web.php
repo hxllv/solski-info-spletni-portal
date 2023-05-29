@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -43,11 +44,6 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/admintest', function ()
-{
-    echo "binz";
-})->middleware('admin');
-
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
@@ -58,9 +54,7 @@ Route::middleware([
     })->name('dashboard');
 
     Route::prefix('admin')->middleware('admin')->group(function () {
-        Route::get('/users', function () {
-            return Inertia::render('Admin/Users');
-        })->name('admin.users');
+        Route::get('/users', [UserController::class, 'index'])->name('admin.users');
 
         Route::get('/roles', function () {
             return Inertia::render('Admin/Roles');

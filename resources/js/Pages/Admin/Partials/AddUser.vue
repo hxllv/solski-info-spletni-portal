@@ -5,23 +5,25 @@ import FormSection from '@/Components/FormSection.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
+import Select from '@/Components/Select.vue';
 import ActionMessage from '@/Components/ActionMessage.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 
 const props = defineProps({
     user: Object,
+    roles: Array,
 });
 
 const form = useForm({
     name: '',
     surname: '',
     email: '',
+    role: ''
 });
 
 const postNewUserData = () => {
-    console.log("yahoo")
+    console.log(form)
 };
-
 </script>
 
 <template>
@@ -73,6 +75,20 @@ const postNewUserData = () => {
                 />
                 <InputError :message="form.errors.email" class="mt-2" />
             </div>
+
+            <!-- Role -->
+            <div class="col-span-6 sm:col-span-4">
+                <InputLabel for="role" value="Skupina pravic" />
+                <Select
+                    id="role"
+                    v-model="form.role"
+                    class="mt-1 block w-full"
+                    autocomplete="role"
+                >
+                    <option v-for="role in roles" :value="role.id">{{role.name}}</option>
+                </Select>
+                <InputError :message="form.errors.email" class="mt-2" />
+            </div>
         </template>
 
         <template #actions>
@@ -81,7 +97,7 @@ const postNewUserData = () => {
             </ActionMessage>
 
             <PrimaryButton :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-                Save
+                Pošlji povabilo
             </PrimaryButton>
         </template>
     </FormSection>
