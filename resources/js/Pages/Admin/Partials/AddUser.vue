@@ -22,7 +22,11 @@ const form = useForm({
 });
 
 const postNewUserData = () => {
-    console.log(form)
+    form.post(route('invite.user'), {
+        onSuccess: () => {
+            form.reset()
+        },
+    });
 };
 </script>
 
@@ -87,13 +91,13 @@ const postNewUserData = () => {
                 >
                     <option v-for="role in roles" :value="role.id">{{role.name}}</option>
                 </Select>
-                <InputError :message="form.errors.email" class="mt-2" />
+                <InputError :message="form.errors.role" class="mt-2" />
             </div>
         </template>
 
         <template #actions>
             <ActionMessage :on="form.recentlySuccessful" class="mr-3">
-                Saved.
+                Povabilo poslano!
             </ActionMessage>
 
             <PrimaryButton :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
