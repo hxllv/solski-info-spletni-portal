@@ -6,17 +6,19 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\URL;
 
 class Invite extends Notification
 {
     use Queueable;
+    protected $data;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct()
+    public function __construct(array $data)
     {
-        //
+        $this->data = $data;
     }
 
     /**
@@ -32,16 +34,21 @@ class Invite extends Notification
     /**
      * Get the mail representation of the notification.
      */
-    public function toMail(object $notifiable): MailMessage
+    public function toMail(): MailMessage
     {
         $appName = env('APP_NAME');
 
+        $url = $this->generateInvitationUrl();
+        $name = $this->data["name"];
+        $surname = $this->data["surname"];
+
         return (new MailMessage)
             ->subject("Povabilo za registracijo - $appName")
-            ->greeting('Pozdravljeni.')
+            ->greeting("Pozdravljeni $name $surname.")
             ->line("Povabljeni ste bili da se registrirate v aplikaciji $appName.")
-            ->action('Kliknite tukaj, da se registrirate', url('/'))
-            ->line('Veljavnost naslova je 24 ur. Če veljavnost poteče, zaprosite za povabilo ponovno.');
+            ->action('Kliknite tukaj, da se registrirate', url($url))
+            ->line('Veljavnost naslova je 24 ur. Če veljavnost poteče, zaprosite za povabilo ponovno.')
+            ->salutation("Lep pozdrav.");
     }
 
     /**
@@ -54,5 +61,22 @@ class Invite extends Notification
         return [
             //
         ];
+    }
+
+    /**
+     * Generates a unique signed URL that the mail receiver can user to register.
+     * The URL contains the UserLevel and the receiver's email address, and will be valid for 1 day.
+     *
+     * @param $notifiable
+     * @return string
+     */
+    public function generateInvitationUrl()
+    {
+        return URL::temporarySignedRoute('invited', now()->addDay(), [
+            'role' => $this->data["role"],
+            'email' => $this->data["email"],
+            'name' => $this->data["name"],
+            'surname' => $this->data["surname"],
+        ]);
     }
 }

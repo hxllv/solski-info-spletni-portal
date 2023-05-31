@@ -42,6 +42,34 @@ class CreateNewUser implements CreatesNewUsers
     }
 
     /**
+     * Create a newly registered user (via invite).
+     *
+     * @param  array<string, string>  $input
+     */
+    public function invite(array $input): User
+    {
+        Validator::make($input, [
+            'name' => ['required', 'string', 'max:255'],
+            'surname' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => $this->passwordRules(),
+            'role' => ['required', 'numeric']
+        ])->validate();
+
+        return DB::transaction(function () use ($input) {
+            return tap(User::create([
+                'name' => $input['name'],
+                'surname' => $input['surname'],
+                'email' => $input['email'],
+                'password' => Hash::make($input['password']),
+                'role_id' => $input['role']
+            ]), function (User $user) {
+                return $user;
+            });
+        });
+    }
+
+    /**
      * Create a personal team for the user.
      */
     protected function createTeam(User $user): void

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\InviteController;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -23,6 +24,7 @@ use Laravel\Fortify\Http\Controllers\TwoFactorQrCodeController;
 use Laravel\Fortify\Http\Controllers\TwoFactorSecretKeyController;
 use Laravel\Fortify\Http\Controllers\VerifyEmailController;
 use Laravel\Fortify\RoutePath;
+use Laravel\Jetstream\Jetstream;
 
 /*
 |--------------------------------------------------------------------------
@@ -42,7 +44,7 @@ Route::get('/', function () {
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
-});
+})->name('indexer');
 
 Route::middleware([
     'auth:sanctum',
@@ -54,15 +56,23 @@ Route::middleware([
     })->name('dashboard');
 
     Route::prefix('admin')->middleware('admin')->group(function () {
-        Route::get('/users', [UserController::class, 'index'])->name('admin.users');
+        // uporabniki
+
+        Route::get('/users', [UserController::class, 'index'])->name('users');
+
+        Route::post('/inviteUser', [InviteController::class, 'send'])->name('invite.user');
+
+        Route::delete('/user/{user}', [UserController::class, 'destroy'])->name('user.delete');
+
+        Route::put('/user/{user}', [UserController::class, 'update'])->name('user.update');
 
         Route::get('/roles', function () {
             return Inertia::render('Admin/Roles');
-        })->name('admin.roles');
+        })->name('roles');
 
         Route::get('/classes', function () {
             return Inertia::render('Admin/Classes');
-        })->name('admin.class');
+        })->name('class');
     })->name('admin');
 });
 
@@ -119,10 +129,19 @@ Route::group(['middleware' => config('fortify.middleware', ['web'])], function (
             Route::get(RoutePath::for('register', '/register'), [RegisteredUserController::class, 'create'])
                 ->middleware(['guest:'.config('fortify.guard'), 'firstUser'])
                 ->name('register');
+
+            //Prikazi registracijo za povabilo
+            Route::get('/invited', [InviteController::class, 'index'])
+                ->middleware('signed')
+                ->name('invited');
         }
 
         Route::post(RoutePath::for('register', '/register'), [RegisteredUserController::class, 'store'])
             ->middleware(['guest:'.config('fortify.guard'), 'firstUser']);
+
+        //Shrani registracijo za povabilo
+        Route::post('/invited', [InviteController::class, 'store'])
+            ->middleware(['guest:'.config('fortify.guard'), 'signed'])->name('invited');
     }
 
     // Email Verification...
