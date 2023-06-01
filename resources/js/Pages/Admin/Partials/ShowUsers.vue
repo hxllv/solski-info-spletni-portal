@@ -67,7 +67,7 @@ const openEditModal = (id) => {
     userEditing.value = true;
     userToEdit.value = id;
 
-    const userTemp = props.users.filter(user => { return user.id === id })[0]
+    const userTemp = props.users.data.filter(user => { return user.id === id })[0]
 
     formEdit.name = userTemp.name
     formEdit.surname = userTemp.surname
