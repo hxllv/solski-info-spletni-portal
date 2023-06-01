@@ -13,7 +13,7 @@ class UserSeeder extends Seeder
     public function run(): void
     {
 
-        for ($i = 15; $i < 100; $i++) {
+        for ($i = 15; $i < 3000; $i++) {
             \App\Models\User::factory()->create([
                 "name" => "Nace$i",
                 "surname" => "Tavcer$i",

@@ -5,21 +5,21 @@ import ShowUsers from '@/Pages/Admin/Partials/ShowUsers.vue';
 
 const props = defineProps({
     roles: Array,
-    users: Array,
-    can: Object,
+    users: Object,
+    params: Object,
 });
 </script>
 
 <template>
-    <AdminLayout title="Dashboard">
+    <AdminLayout title="Dashboard" v-slot="layout">
         <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
             <div>
-                <AddUser :user="$page.props.auth.user" :roles="roles" v-if="props.can.invite"/>   
+                <AddUser :user="$page.props.auth.user" :roles="roles"/>   
             </div>
         </div>
         <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
             <div>
-                <ShowUsers :users="users" :roles="roles" />
+                <ShowUsers :users="users" :roles="roles" :params="params" :buffer="layout.buffer"/>
             </div>
         </div>
     </AdminLayout>

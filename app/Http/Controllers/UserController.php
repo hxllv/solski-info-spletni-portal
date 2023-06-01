@@ -13,14 +13,41 @@ use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
 
 class UserController extends Controller
 {
-    public function index(): Response
-    {
+    public function index(Request $request): Response
+    {   
+        $data = request()->validate([
+            'term' => 'string|nullable',
+            'role' => 'numeric|nullable',
+        ]);
+
+        $mQuery = User::query();
+
+        $data['term'] = $data['term'] ?? '';
+        $data['role'] = $data['role'] ?? '';
+
+        $mQuery->where(function ($query) use ($data) {
+            $query->where('surname', 'LIKE', '%'.$data['term'].'%')
+                ->orWhere('email', 'LIKE', '%'.$data['term'].'%')
+                ->orWhere('name', 'LIKE', '%'.$data['term'].'%');
+        });
+
+        if ($data['role'] !== '') {  
+            $mQuery->where('role_id', $data['role']);
+        }
+
+        /* $users = User::where(function ($query) use ($data) {
+                $query->where('surname', 'LIKE', '%'.$data['term'].'%')
+                    ->orWhere('email', 'LIKE', '%'.$data['term'].'%')
+                    ->orWhere('name', 'LIKE', '%'.$data['term'].'%');
+            })->where('role_id', '=', $data['role'])->paginate(10); */
+
         return Inertia::render('Admin/Users', 
             [
                 'roles' => Role::all(),
-                'users' => User::all(),
-                'can' => [
-                    'invite' => auth()->user()->can('invite', User::class)
+                'users' => $mQuery->paginate(10),
+                'params' => [
+                    'term' => $data['term'],
+                    'role' => $data['role'],
                 ]
             ]
         );

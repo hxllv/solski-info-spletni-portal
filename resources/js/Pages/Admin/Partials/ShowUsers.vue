@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue';
-import { useForm } from '@inertiajs/vue3';
+import { useForm, Link } from '@inertiajs/vue3';
 import DangerButton from '@/Components/DangerButton.vue';
 import DialogModal from '@/Components/DialogModal.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
@@ -12,8 +12,10 @@ import TextInput from '@/Components/TextInput.vue';
 import Select from '@/Components/Select.vue';
 
 const props = defineProps({
-    users: Array,
+    users: Object,
     roles: Array,
+    params: Object,
+    buffer: Boolean
 });
 
 const confirmingUserDeletion = ref(false);
@@ -26,6 +28,10 @@ const formEdit = useForm({
     surname: '',
     email: '',
     role: ''
+});
+const formFilter = useForm({
+    term: props.params.term,
+    role: props.params.role,
 });
 
 // deleting
@@ -85,7 +91,7 @@ const hatedProps = ['created_at', 'current_team_id', 'email_verified_at', 'role_
 const usersMod = computed(() => {
     let newUsers = JSON.parse(JSON.stringify(props.users));
 
-    newUsers.forEach(user => {
+    newUsers.data.forEach(user => {
         user.fullname = `${user.name} ${user.surname}`
         user.role = props.roles.filter(role => { return role.id === user.role_id })[0].name
         user.class = 'R1a'
@@ -100,121 +106,160 @@ const usersMod = computed(() => {
 </script>
 
 <template>
-    <div class="shadow">
-        <Table :data="usersMod" :headerNames="['Ime', 'Email', 'Razred', 'Skupina pravic']" 
-            :sortedAs="['fullname', 'email', 'class', 'role']" 
-            :allowEdit="true" :allowDelete="true" 
-            @edit="openEditModal" 
-            @delete="openDeleteModal"
-        />
-
-        <!-- deleting -->
-
-        <DialogModal :show="confirmingUserDeletion" @close="closeDeleteModal"> 
-            <template #title>
-                Delete Account
-            </template>
-
-            <template #content>
-                Are you sure you want to delete this account? Once this account is deleted, all of its resources and data will be permanently deleted.
-            </template>
-
-            <template #footer>
-                <SecondaryButton @click="closeDeleteModal">
-                    Cancel
+    <div class="md:grid md:grid-cols-3 md:gap-6">
+        <div class="mt-5 md:mt-0 md:col-span-1 p-2">
+            <InputLabel for="term" value="Iskalni niz" />
+            <TextInput
+                id="term"
+                v-model="formFilter.term"
+                type="text"
+                class="mt-1 block w-full"
+                autocomplete="term"
+            />
+        </div>
+        <div class="mt-5 md:mt-0 md:col-span-1 p-2">
+            <InputLabel for="roleFilter" value="Skupina pravic" />
+            <Select
+                id="roleFilter"
+                v-model="formFilter.role"
+                class="mt-1 block w-full"
+                autocomplete="role"
+                :defaultValue="''"
+            >
+                <option value="">Vsi</option>
+                <option v-for="role in roles" :value="role.id">{{role.name}}</option>
+            </Select>
+        </div>
+        <div class="mt-5 md:mt-0 md:col-span-1 p-2 text-right flex items-end justify-end">
+            <Link preserve-scroll preserve-state :href="route('users')" :data="{ page: 1, term: '', role: '' }" class="mr-1" @click="formFilter.reset()">
+                <SecondaryButton>
+                        Reset
                 </SecondaryButton>
+            </Link>
 
-                <DangerButton
-                    class="ml-3"
-                    @click="deleteUser"
+            <Link preserve-scroll preserve-state :href="route('users')" :data="{ page: 1, term: formFilter.term, role: formFilter.role }">
+                <PrimaryButton>
+                        Apply
+                </PrimaryButton>
+            </Link>
+        </div>
+    </div>
+    
+    <Table :data="usersMod" :headerNames="['Ime', 'Email', 'Razred', 'Skupina pravic']" 
+        :sortedAs="['fullname', 'email', 'class', 'role']" 
+        :allowEdit="true" :allowDelete="true" 
+        @edit="openEditModal" 
+        @delete="openDeleteModal"
+        :query="{ term: formFilter.term, role: formFilter.role }"
+        :buffer="buffer"
+    />
+
+    <!-- deleting -->
+
+    <DialogModal :show="confirmingUserDeletion" @close="closeDeleteModal"> 
+        <template #title>
+            Delete Account
+        </template>
+
+        <template #content>
+            Are you sure you want to delete this account? Once this account is deleted, all of its resources and data will be permanently deleted.
+        </template>
+
+        <template #footer>
+            <SecondaryButton @click="closeDeleteModal">
+                Cancel
+            </SecondaryButton>
+
+            <DangerButton
+                class="ml-3"
+                @click="deleteUser"
+            >
+                Delete Account
+            </DangerButton>
+        </template>
+    </DialogModal>
+
+    <!-- editing -->
+
+    <DialogModal :show="userEditing" @close="closeEditModal"> 
+        <template #title>
+            Edit Account
+        </template>
+
+        <template #content>
+            <form @submit.prevent="">
+                <div
+                    class="px-4 py-5 bg-white sm:p-6"
                 >
-                    Delete Account
-                </DangerButton>
-            </template>
-        </DialogModal>
+                    <!-- Name -->
+                    <div class="grid grid-cols-6 gap-6">
+                        <div class="col-span-6 sm:col-span-4">
+                            <InputLabel for="name" value="Ime" />
+                            <TextInput
+                                id="name"
+                                v-model="formEdit.name"
+                                type="text"
+                                class="mt-1 block w-full"
+                                autocomplete="name"
+                            />
+                            <InputError :message="formEdit.errors.name" class="mt-2" />
+                        </div>
 
-        <!-- editing -->
+                        <!-- Surname -->
+                        <div class="col-span-6 sm:col-span-4">
+                            <InputLabel for="surname" value="Priimek" />
+                            <TextInput
+                                id="surname"
+                                v-model="formEdit.surname"
+                                type="text"
+                                class="mt-1 block w-full"
+                                autocomplete="surname"
+                            />
+                            <InputError :message="formEdit.errors.surname" class="mt-2" />
+                        </div>
 
-        <DialogModal :show="userEditing" @close="closeEditModal"> 
-            <template #title>
-                Edit Account
-            </template>
+                        <!-- Email -->
+                        <div class="col-span-6 sm:col-span-4">
+                            <InputLabel for="email" value="Email" />
+                            <TextInput
+                                id="email"
+                                v-model="formEdit.email"
+                                type="text"
+                                class="mt-1 block w-full"
+                                autocomplete="email"
+                            />
+                            <InputError :message="formEdit.errors.email" class="mt-2" />
+                        </div>
 
-            <template #content>
-                <form @submit.prevent="">
-                    <div
-                        class="px-4 py-5 bg-white sm:p-6"
-                    >
-                        <!-- Name -->
-                        <div class="grid grid-cols-6 gap-6">
-                            <div class="col-span-6 sm:col-span-4">
-                                <InputLabel for="name" value="Ime" />
-                                <TextInput
-                                    id="name"
-                                    v-model="formEdit.name"
-                                    type="text"
-                                    class="mt-1 block w-full"
-                                    autocomplete="name"
-                                />
-                                <InputError :message="formEdit.errors.name" class="mt-2" />
-                            </div>
-
-                            <!-- Surname -->
-                            <div class="col-span-6 sm:col-span-4">
-                                <InputLabel for="surname" value="Priimek" />
-                                <TextInput
-                                    id="surname"
-                                    v-model="formEdit.surname"
-                                    type="text"
-                                    class="mt-1 block w-full"
-                                    autocomplete="surname"
-                                />
-                                <InputError :message="formEdit.errors.surname" class="mt-2" />
-                            </div>
-
-                            <!-- Email -->
-                            <div class="col-span-6 sm:col-span-4">
-                                <InputLabel for="email" value="Email" />
-                                <TextInput
-                                    id="email"
-                                    v-model="formEdit.email"
-                                    type="text"
-                                    class="mt-1 block w-full"
-                                    autocomplete="email"
-                                />
-                                <InputError :message="formEdit.errors.email" class="mt-2" />
-                            </div>
-
-                            <!-- Role -->
-                            <div class="col-span-6 sm:col-span-4">
-                                <InputLabel for="role" value="Skupina pravic" />
-                                <Select
-                                    id="role"
-                                    v-model="formEdit.role"
-                                    class="mt-1 block w-full"
-                                    autocomplete="role"
-                                >
-                                    <option v-for="role in roles" :value="role.id">{{role.name}}</option>
-                                </Select>
-                                <InputError :message="formEdit.errors.role" class="mt-2" />
-                            </div>
+                        <!-- Role -->
+                        <div class="col-span-6 sm:col-span-4">
+                            <InputLabel for="role" value="Skupina pravic" />
+                            <Select
+                                id="role"
+                                v-model="formEdit.role"
+                                class="mt-1 block w-full"
+                                autocomplete="role"
+                            >
+                                <option v-for="role in roles" :value="role.id">{{role.name}}</option>
+                            </Select>
+                            <InputError :message="formEdit.errors.role" class="mt-2" />
                         </div>
                     </div>
-                </form>
-            </template>
+                </div>
+            </form>
+        </template>
 
-            <template #footer>
-                <SecondaryButton @click="closeEditModal">
-                    Cancel
-                </SecondaryButton>
+        <template #footer>
+            <SecondaryButton @click="closeEditModal">
+                Cancel
+            </SecondaryButton>
 
-                <PrimaryButton
-                    class="ml-3"
-                    @click="editUserData"
-                >
-                    Save
-                </PrimaryButton>
-            </template>
-        </DialogModal>
-    </div>
+            <PrimaryButton
+                class="ml-3"
+                @click="editUserData"
+            >
+                Save
+            </PrimaryButton>
+        </template>
+    </DialogModal>
 </template>
