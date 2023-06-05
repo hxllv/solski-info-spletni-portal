@@ -5,9 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Role extends Model
+class Middleware extends Model
 {
     use HasFactory;
+
+    public $incrementing = false;
+    protected  $primaryKey = 'name';
 
     /**
      * The attributes that are mass assignable.
@@ -18,13 +21,8 @@ class Role extends Model
         'name'
     ];
 
-    public function users()
+    public function roles()
     {
-        return $this->hasMany(User::class);
-    }
-
-    public function middlewares()
-    {
-        return $this->belongsToMany(Middleware::class);
+        return $this->belongsToMany(Role::class);
     }
 }

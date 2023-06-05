@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class Admin
+class UsersView
 {
     /**
      * Handle an incoming request.
@@ -15,7 +15,7 @@ class Admin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if ($request->user() && $request->user()->role()->get()[0]->id === 1) return $next($request);
+        if ($request->user() && $request->user()->role->middlewares->find('users.view')) return $next($request);
 
         return abort(403, "Unauthorized");
     }

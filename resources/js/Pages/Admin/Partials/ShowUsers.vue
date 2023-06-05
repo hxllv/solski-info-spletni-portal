@@ -15,7 +15,8 @@ const props = defineProps({
     users: Object,
     roles: Array,
     params: Object,
-    buffer: Boolean
+    buffer: Boolean,
+    middleware: Array
 });
 
 const confirmingUserDeletion = ref(false);
@@ -147,7 +148,7 @@ const usersMod = computed(() => {
     
     <Table :data="usersMod" :headerNames="['Ime', 'Email', 'Razred', 'Skupina pravic']" 
         :sortedAs="['fullname', 'email', 'class', 'role']" 
-        :allowEdit="true" :allowDelete="true" 
+        :allowEdit="middleware.includes('users.edit')" :allowDelete="middleware.includes('users.delete')" 
         @edit="openEditModal" 
         @delete="openDeleteModal"
         :query="{ term: formFilter.term, role: formFilter.role }"

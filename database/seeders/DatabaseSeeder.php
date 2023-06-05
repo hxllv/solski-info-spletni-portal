@@ -14,17 +14,34 @@ class DatabaseSeeder extends Seeder
     {
         // \App\Models\User::factory(10)->create();
 
-        \App\Models\Role::factory()->create([
+        $admin = \App\Models\Role::factory()->create([
             'name' => 'Administrator',
         ]);
 
-        \App\Models\Role::factory()->create([
+        $teacher = \App\Models\Role::factory()->create([
             'name' => 'Učitelj',
         ]);
 
-        \App\Models\Role::factory()->create([
+        $student = \App\Models\Role::factory()->create([
             'name' => 'Učenec',
         ]);
+
+        \App\Models\Middleware::factory()->hasAttached([$admin, $teacher])->create(['name' => 'users.view']);
+        \App\Models\Middleware::factory()->hasAttached([$admin, $teacher])->create(['name' => 'users.invite']);
+        \App\Models\Middleware::factory()->hasAttached($admin)->create(['name' => 'users.edit']);
+        \App\Models\Middleware::factory()->hasAttached($admin)->create(['name' => 'users.delete']);
+        \App\Models\Middleware::factory()->hasAttached($admin)->create(['name' => 'roles.view']);
+        \App\Models\Middleware::factory()->hasAttached($admin)->create(['name' => 'roles.create']);
+        \App\Models\Middleware::factory()->hasAttached($admin)->create(['name' => 'roles.edit']);
+        \App\Models\Middleware::factory()->hasAttached($admin)->create(['name' => 'roles.delete']);
+
+        /* ['name' => 'users.invite'],
+        ['name' => 'users.edit'],
+        ['name' => 'users.delete'],
+        ['name' => 'roles.view'],
+        ['name' => 'roles.create'],
+        ['name' => 'roles.edit'],
+        ['name' => 'roles.delete'], */
 
         /* \App\Models\User::factory()->create([
             'name' => 'Nace',

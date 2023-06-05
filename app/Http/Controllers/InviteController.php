@@ -11,9 +11,6 @@ use App\Models\User;
 use App\Models\Role;
 use Laravel\Fortify\Contracts\RegisterResponse;
 use Illuminate\Contracts\Auth\StatefulGuard;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
 use App\Actions\Fortify\PasswordValidationRules;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
 use Illuminate\Auth\Events\Registered;
@@ -54,9 +51,14 @@ class InviteController extends Controller
     public function store(Request $request, CreatesNewUsers $creator): RegisterResponse
     {
         $email = $request->input('email');
+        $role = $request->input('role');
 
         if (User::where('email', $email)->get()->count() !== 0)
             abort(403, 'Email is already registered');
+
+        if (Role::where('id', $role)->get()->count() === 0)
+        abort(403, 'Invalid role');
+
 
         event(new Registered($creator->invite($request->all())));
 

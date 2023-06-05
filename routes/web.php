@@ -55,10 +55,10 @@ Route::middleware([
         return Inertia::render('Dashboard');
     })->name('dashboard');
 
-    Route::prefix('admin')->middleware('admin')->group(function () {
+    Route::prefix('admin')/* TODO: admin panel permission ->middleware('admin') */->group(function () {
         // uporabniki
 
-        Route::get('/users', [UserController::class, 'index'])->name('users');
+        Route::get('/users', [UserController::class, 'index'])->middleware('users.view')->name('users');
 
         Route::post('/inviteUser', [InviteController::class, 'send'])->name('invite.user');
 

@@ -35,12 +35,6 @@ class UserController extends Controller
             $mQuery->where('role_id', $data['role']);
         }
 
-        /* $users = User::where(function ($query) use ($data) {
-                $query->where('surname', 'LIKE', '%'.$data['term'].'%')
-                    ->orWhere('email', 'LIKE', '%'.$data['term'].'%')
-                    ->orWhere('name', 'LIKE', '%'.$data['term'].'%');
-            })->where('role_id', '=', $data['role'])->paginate(10); */
-
         return Inertia::render('Admin/Users', 
             [
                 'roles' => Role::all(),
@@ -48,7 +42,8 @@ class UserController extends Controller
                 'params' => [
                     'term' => $data['term'],
                     'role' => $data['role'],
-                ]
+                ],
+                'middleware' => auth()->user()->role->middlewares->pluck('name')->toArray()
             ]
         );
     }
