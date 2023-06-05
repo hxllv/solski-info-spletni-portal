@@ -2,6 +2,7 @@
 
 namespace App\Actions\Fortify;
 
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Support\Facades\Validator;
@@ -32,8 +33,10 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
                 'name' => $input['name'],
                 'surname' => $input['surname'],
                 'email' => $input['email'],
-                'role_id' => $input['role'],
-            ])->save();
+            ]);
+
+            $user->role()->associate(Role::find($input['role']));
+            $user->save();
         }
     }
 
@@ -48,9 +51,11 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
             'name' => $input['name'],
             'surname' => $input['surname'],
             'email' => $input['email'],
-            'role_id' => $input['role'],
             'email_verified_at' => null,
-        ])->save();
+        ]);
+
+        $user->role()->associate(Role::find($input['role']));
+        $user->save();
 
         $user->sendEmailVerificationNotification();
     }

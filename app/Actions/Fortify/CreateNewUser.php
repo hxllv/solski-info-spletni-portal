@@ -2,6 +2,7 @@
 
 namespace App\Actions\Fortify;
 
+use App\Models\Role;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -56,7 +57,16 @@ class CreateNewUser implements CreatesNewUsers
             'role' => ['required', 'numeric']
         ])->validate();
 
-        return DB::transaction(function () use ($input) {
+        $role = Role::find($input['role']);
+
+        return $role->users()->create([
+            'name' => $input['name'],
+            'surname' => $input['surname'],
+            'email' => $input['email'],
+            'password' => Hash::make($input['password']),
+        ]);
+
+        /* return DB::transaction(function () use ($input) {
             return tap(User::create([
                 'name' => $input['name'],
                 'surname' => $input['surname'],
@@ -66,7 +76,7 @@ class CreateNewUser implements CreatesNewUsers
             ]), function (User $user) {
                 return $user;
             });
-        });
+        }); */
     }
 
     /**
