@@ -103,6 +103,7 @@ class RoleController extends Controller
         else {
             $role->middlewares()->attach('admin.panel.view');
             $role->middlewares()->attach(
+                // DEMON HACK, thank god for php helpers
                 array_flip(array_intersect_key(
                     // get keys where true + flip
                     array_flip(array_keys($middlewares, true)), 
