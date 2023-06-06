@@ -96,21 +96,12 @@ class RoleController extends Controller
         if (!$middlewares)
             return;
 
+        $role->middlewares()->attach(array_keys($middlewares, true));
+        $role->middlewares()->detach(array_keys($middlewares, false));
+
         if (!$middlewares['admin.panel.view']) {
             $role->middlewares()->detach('admin.panel.view');
             $role->middlewares()->detach($this->adminPanelSubMiddlewares);
-        }
-        else {
-            $role->middlewares()->attach('admin.panel.view');
-            $role->middlewares()->attach(
-                // DEMON HACK, thank god for php helpers
-                array_flip(array_intersect_key(
-                    // get keys where true + flip
-                    array_flip(array_keys($middlewares, true)), 
-                    // flip the array so the values become the keys
-                    array_flip($this->adminPanelSubMiddlewares)
-                ))
-            );
         }
 
         $role->save();
