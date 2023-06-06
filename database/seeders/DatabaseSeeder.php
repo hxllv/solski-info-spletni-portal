@@ -44,10 +44,10 @@ class DatabaseSeeder extends Seeder
         ['name' => 'roles.edit'],
         ['name' => 'roles.delete'], */
 
-        /* \App\Models\User::factory()->create([
+        \App\Models\User::factory()->for($admin)->create([
             'name' => 'Nace',
             'surname' => 'Tavcer',
             'email' => 'nace.tavcer20@gmail.com',
-        ]); */
+        ]);
     }
 }

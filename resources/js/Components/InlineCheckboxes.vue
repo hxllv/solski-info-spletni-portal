@@ -2,7 +2,7 @@
 import InputLabel from '@/Components/InputLabel.vue';
 import Checkbox from '@/Components/Checkbox.vue';
 import { useForm } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import { ref } from 'vue';
 
 const props = defineProps({
     items: Array,
@@ -12,14 +12,14 @@ const props = defineProps({
 const emit = defineEmits(['formChange']);
 
 const emitter = () => {
-    emit('formChange', form)
+    emit('formChange', form.value)
 }
 
-const form = useForm(props.form)
+const form = ref(props.form)
 </script>
 
 <template>
-    <ul class="items-center justify-center w-full text-sm font-medium text-gray-900 bg-white sm:flex">
+    <ul class="items-center justify-center w-full text-sm font-medium text-gray-900 flex">
         <li class="w-full" v-for="item in items">
             <div class="flex items-center pl-3">
                 <InputLabel :for="item.id">

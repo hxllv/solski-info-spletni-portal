@@ -18,10 +18,12 @@ const props = defineProps({
     middleware: Array
 });
 
+const permissionsForItem = ref(false);
 const confirmingDeletion = ref(false);
 const editing = ref(false);
 const itemToDelete = ref(false);
 const itemToEdit = ref(false);
+let formPermissions = ref(false);
 const formDelete = useForm({});
 const formEdit = useForm({
     name: '',
@@ -64,16 +66,24 @@ const openEditModal = (id) => {
     itemToEdit.value = id;
 
     const roleTemp = props.roles.data.filter(role => { return role.id === id })[0]
+    permissionsForItem.value = roleTemp.middlewares.map(mw => mw.name)
 
     formEdit.name = roleTemp.name
 };
 
 const editItemData = () => {
-    formEdit.put(route('role.update', itemToEdit.value), {
+    formEdit.transform(data => ({
+        ...data,
+        middlewares: formPermissions.value
+    })).put(route('role.update', itemToEdit.value), {
         preserveScroll: true,
         onSuccess: () => closeEditModal(),
         onError: () => {},
     });
+}
+
+const formChange = (data) => {
+    formPermissions.value = data
 }
 </script>
 
@@ -166,7 +176,7 @@ const editItemData = () => {
                             <InputError :message="formEdit.errors.name" class="mt-2" />
                         </div>
 
-                        <SelectPermissions />
+                        <SelectPermissions :data="permissionsForItem" @formChange="formChange"/>
                     </div>
                 </div>
             </form>

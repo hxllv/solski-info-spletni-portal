@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Middleware;
 use App\Models\Role;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -12,6 +13,21 @@ use Illuminate\Support\Facades\DB;
 
 class RoleController extends Controller
 {
+    readonly array $adminPanelSubMiddlewares;
+
+    public function __construct() {
+        $this->adminPanelSubMiddlewares = [
+            'users.view',
+            'users.invite',
+            'users.edit',
+            'users.delete',
+            'roles.view',
+            'roles.create',
+            'roles.edit',
+            'roles.delete',
+        ];
+    }
+
     public function index(): Response
     {
         $this->authorize('view', Role::class);
@@ -26,21 +42,24 @@ class RoleController extends Controller
 
         $mQuery->where('name', 'LIKE', '%'.$data['term'].'%');
 
+        $middlewares = auth()->user()->role->middlewares->pluck('name')->toArray();
+
+        if (auth()->user()->is_account_owner) 
+            $middlewares = Middleware::all()->pluck('name')->toArray();
+
         return Inertia::render('Admin/Roles', 
         [
-            'roles' => $mQuery->paginate(10),
+            'roles' => $mQuery->with('middlewares')->paginate(10),
             'params' => [
                 'term' => $data['term'],
             ],
-            'middleware' => auth()->user()->role->middlewares->pluck('name')->toArray()
+            'middleware' => $middlewares
         ]);
     }
 
     public function store(Request $request)
     {
         $this->authorize('create', Role::class);
-
-        //dd($request);
 
         $input = $request->all();
 
@@ -65,11 +84,35 @@ class RoleController extends Controller
 
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255', Rule::unique('roles')->ignore($role->id)],
+            'middlewares' => ['exclude_if:middlewares,false', 'array']
         ]);
 
         $role->forceFill([
             'name' => $input['name'],
-        ])->save();
+        ]);
+
+        $middlewares = $input['middlewares'];
+
+        if (!$middlewares)
+            return;
+
+        if (!$middlewares['admin.panel.view']) {
+            $role->middlewares()->detach('admin.panel.view');
+            $role->middlewares()->detach($this->adminPanelSubMiddlewares);
+        }
+        else {
+            $role->middlewares()->attach('admin.panel.view');
+            $role->middlewares()->attach(
+                array_flip(array_intersect_key(
+                    // get keys where true + flip
+                    array_flip(array_keys($middlewares, true)), 
+                    // flip the array so the values become the keys
+                    array_flip($this->adminPanelSubMiddlewares)
+                ))
+            );
+        }
+
+        $role->save();
     }
 
     public function destroy(Role $role)

@@ -8,6 +8,7 @@ use App\Models\Role;
 use App\Models\User;
 use Inertia\Response;
 use App\Actions\Jetstream\DeleteUser;
+use App\Models\Middleware;
 use Laravel\Fortify\Contracts\ProfileInformationUpdatedResponse;
 use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
 
@@ -33,9 +34,13 @@ class UserController extends Controller
                 ->orWhere('name', 'LIKE', '%'.$data['term'].'%');
         });
 
-        if ($data['role'] !== '') {  
+        if ($data['role'] !== '') 
             $mQuery->where('role_id', $data['role']);
-        }
+
+        $middlewares = auth()->user()->role->middlewares->pluck('name')->toArray();
+
+        if (auth()->user()->is_account_owner) 
+            $middlewares = Middleware::all()->pluck('name')->toArray();
 
         return Inertia::render('Admin/Users', 
             [
@@ -45,7 +50,7 @@ class UserController extends Controller
                     'term' => $data['term'],
                     'role' => $data['role'],
                 ],
-                'middleware' => auth()->user()->role->middlewares->pluck('name')->toArray()
+                'middleware' => $middlewares
             ]
         );
     }
@@ -71,6 +76,11 @@ class UserController extends Controller
         if (auth()->user()->id === $user->id)
             return redirect()->back()->withErrors([
                 'delete' => 'Can\'t delete yourself.'
+            ]);
+
+        if ($user->is_account_owner)
+            return redirect()->back()->withErrors([
+                'delete' => 'Can\'t delete account owner.'
             ]);
 
         app(DeleteUser::class)->delete($user);

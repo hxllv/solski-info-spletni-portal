@@ -34,7 +34,8 @@ class UserFactory extends Factory
             'two_factor_recovery_codes' => null,
             'remember_token' => Str::random(10),
             'current_team_id' => null,
-            'role_id' => 1  
+            'role_id' => 1,
+            'is_account_owner' => true
         ];
     }
 
