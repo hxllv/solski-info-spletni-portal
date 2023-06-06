@@ -5,26 +5,17 @@ import { useForm } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
 const props = defineProps({
-    items: Array
+    items: Array,
+    form: Object
 });
 
-const emit = defineEmits(['permissionFormChange']);
+const emit = defineEmits(['formChange']);
 
 const emitter = () => {
-    emit('permissionFormChange', form)
+    emit('formChange', form)
 }
 
-const form = useForm({
-    ...computed(() => {
-        let data = {};
-
-        props.items.forEach(item => {
-            data[item.id] = false
-        })
-
-        return data
-    })
-});
+const form = useForm(props.form)
 </script>
 
 <template>
