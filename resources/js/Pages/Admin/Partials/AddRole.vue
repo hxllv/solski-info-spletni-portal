@@ -8,22 +8,23 @@ import TextInput from '@/Components/TextInput.vue';
 import ActionMessage from '@/Components/ActionMessage.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 
-const props = defineProps({
-    user: Object,
-});
-
 const form = useForm({
     name: '',
 });
 
-const postNewRoleData = () => {
-    console.log("yahoo")
+const postNewData = () => {
+    form.post(route('create.role'), {
+        preserveState: true,
+        onSuccess: () => {
+            form.reset()
+        },
+    });
 };
 
 </script>
 
 <template>
-    <FormSection @submitted="postNewRoleData">
+    <FormSection @submitted="postNewData">
         <template #title>
             Dodaj skupino pravic
         </template>

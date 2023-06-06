@@ -13,12 +13,14 @@ use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
 
 class UserController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(): Response
     {   
+        $this->authorize('view', User::class);
+
         $data = request()->validate([
             'term' => 'string|nullable',
             'role' => 'numeric|nullable',
-        ]);
+        ]); 
 
         $mQuery = User::query();
 
@@ -50,9 +52,11 @@ class UserController extends Controller
 
     public function update(User $user, Request $request, UpdatesUserProfileInformation $updater)
     {
+        $this->authorize('edit', User::class);
+
         if (Role::where('id', $request->input('role'))->get()->count() === 0)
             return redirect()->back()->withErrors([
-                'role' => 'Neveljavna skupina pravic.'
+                'role' => 'Invalid role group.'
             ]);
 
         $updater->update($user, $request->all());
@@ -62,8 +66,12 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
+        $this->authorize('delete', User::class);
+
         if (auth()->user()->id === $user->id)
-            abort(403, 'Cannot delete yourself');
+            return redirect()->back()->withErrors([
+                'delete' => 'Can\'t delete yourself.'
+            ]);
 
         app(DeleteUser::class)->delete($user);
     }

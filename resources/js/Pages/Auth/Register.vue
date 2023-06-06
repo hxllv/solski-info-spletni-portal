@@ -47,8 +47,8 @@ const submit = () => {
                 <InputError class="mt-2" :message="form.errors.name" />
             </div>
 
-            <div>
-                <InputLabel for="surname" value="Name" />
+            <div class="mt-4">
+                <InputLabel for="surname" value="Surname" />
                 <TextInput
                     id="surname"
                     v-model="form.surname"

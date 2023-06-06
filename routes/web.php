@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\InviteController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\RoleController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -58,17 +59,17 @@ Route::middleware([
     Route::prefix('admin')/* TODO: admin panel permission ->middleware('admin') */->group(function () {
         // uporabniki
 
-        Route::get('/users', [UserController::class, 'index'])->middleware('users.view')->name('users');
-
+        Route::get('/users', [UserController::class, 'index'])->name('users');
         Route::post('/inviteUser', [InviteController::class, 'send'])->name('invite.user');
-
         Route::delete('/user/{user}', [UserController::class, 'destroy'])->name('user.delete');
-
         Route::put('/user/{user}', [UserController::class, 'update'])->name('user.update');
 
-        Route::get('/roles', function () {
-            return Inertia::render('Admin/Roles');
-        })->name('roles');
+        // skupine pravic in pravice
+
+        Route::get('/roles', [RoleController::class, 'index'])->name('roles');
+        Route::post('/roles', [RoleController::class, 'store'])->name('create.role');
+        Route::delete('/roles/{role}', [RoleController::class, 'destroy'])->name('role.delete');
+        Route::put('/roles/{role}', [RoleController::class, 'update'])->name('role.update');
 
         Route::get('/classes', function () {
             return Inertia::render('Admin/Classes');

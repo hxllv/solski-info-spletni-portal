@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Učenec',
         ]);
 
+        \App\Models\Middleware::factory()->hasAttached([$admin, $teacher])->create(['name' => 'admin.panel.view']);
         \App\Models\Middleware::factory()->hasAttached([$admin, $teacher])->create(['name' => 'users.view']);
         \App\Models\Middleware::factory()->hasAttached([$admin, $teacher])->create(['name' => 'users.invite']);
         \App\Models\Middleware::factory()->hasAttached($admin)->create(['name' => 'users.edit']);

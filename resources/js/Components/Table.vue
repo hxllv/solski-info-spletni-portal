@@ -19,18 +19,18 @@ defineEmits(['edit', 'delete']);
     <div class="relative shadow">
         <Spinner :buffer="buffer" />
 
-        <div class="overflow-x-auto md:grid md:grid-cols-3 sm:rounded-t-md">
-            <table class="table-auto mt-0 md:col-span-3">
-                <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+        <div class="overflow-x-auto grid grid-cols-3 sm:rounded-t-md">
+            <table class="table-auto mt-0 col-span-3">
+                <thead class="text-xs text-left text-gray-700 uppercase bg-gray-50">
                     <tr>
                         <th scope="col" class="px-6 py-3 border-r" v-for="name in headerNames">{{ name }}</th>
-                        <th scope="col" class="px-6 py-3" v-if="allowEdit || allowDelete"></th>
+                        <th scope="col" class="px-6 py-3 max-w-max" v-if="allowEdit || allowDelete"></th>
                     </tr>
                 </thead>
                 <tbody class="text-xs md:text-sm lg:text-base">
                     <tr v-for="row in data.data" class="bg-white border-b hover:bg-gray-100">
                         <td class="px-6 py-4 border-r" v-for="propName in sortedAs">{{ row[propName] }}</td>
-                        <td class="px-6 py-4 text-right" v-if="allowEdit || allowDelete">
+                        <td class="px-6 py-4 text-right max-w-max" v-if="allowEdit || allowDelete">
                             <a class="cursor-pointer" @click="$emit('edit', row.id)" v-if="allowEdit">
                                 <font-awesome-icon icon="fa-solid fa-pen" class="text-gray-700 px-2"/> 
                             </a>

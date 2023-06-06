@@ -28,6 +28,8 @@ class InviteController extends Controller
     
     public function send()
     {
+        $this->authorize('invite', User::class);
+
         $data = request()->validate([
             'name' => 'required|string',
             'surname' => 'required|string',
@@ -37,12 +39,12 @@ class InviteController extends Controller
 
         if (User::where('email', $data['email'])->get()->count() !== 0)
             return redirect()->back()->withErrors([
-                'email' => 'Email je že registriran.'
+                'email' => 'Email is already registered.'
             ]);
 
         if (Role::where('id', $data['role'])->get()->count() === 0)
             return redirect()->back()->withErrors([
-                'role' => 'Neveljavna skupina pravic.'
+                'role' => 'Invalid role group.'
             ]);
 
         Notification::route('mail', $data['email'])->notify(new Invite($data));
@@ -54,10 +56,10 @@ class InviteController extends Controller
         $role = $request->input('role');
 
         if (User::where('email', $email)->get()->count() !== 0)
-            abort(403, 'Email is already registered');
+            abort(403, 'Email is already registered.');
 
         if (Role::where('id', $role)->get()->count() === 0)
-        abort(403, 'Invalid role');
+            abort(403, 'Invalid role group.');
 
 
         event(new Registered($creator->invite($request->all())));
@@ -73,7 +75,7 @@ class InviteController extends Controller
         $surname = $request->input('surname');
 
         if (User::where('email', $email)->get()->count() !== 0)
-            abort(403, 'Email is already registered');
+            abort(403, 'Email is already registered.');
 
         $url = URL::temporarySignedRoute('invited', now()->addMinutes(30), [
             'role' => $role,

@@ -10,7 +10,6 @@ import ActionMessage from '@/Components/ActionMessage.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 
 const props = defineProps({
-    user: Object,
     roles: Array,
 });
 

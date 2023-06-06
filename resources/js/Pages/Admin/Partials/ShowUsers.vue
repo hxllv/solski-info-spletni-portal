@@ -81,7 +81,6 @@ const editUserData = () => {
         errorBag: 'updateProfileInformation',
         preserveScroll: true,
         onSuccess: () => closeEditModal(),
-        onError: () => {},
     });
 }
 
@@ -164,6 +163,8 @@ const usersMod = computed(() => {
 
         <template #content>
             Are you sure you want to delete this account? Once this account is deleted, all of its resources and data will be permanently deleted.
+
+            <InputError :message="formDelete.errors.delete" class="mt-2" />
         </template>
 
         <template #footer>
