@@ -30,12 +30,11 @@ class CreateNewUser implements CreatesNewUsers
         ])->validate();
 
         return DB::transaction(function () use ($input) {
-            return tap(User::create([
+            return tap(Role::find(1)->users()->create([
                 'name' => $input['name'],
                 'surname' => $input['surname'],
                 'email' => $input['email'],
                 'password' => Hash::make($input['password']),
-                'role_id' => 1
             ]), function (User $user) {
                 return $user;
             });
@@ -59,24 +58,16 @@ class CreateNewUser implements CreatesNewUsers
 
         $role = Role::find($input['role']);
 
-        return $role->users()->create([
-            'name' => $input['name'],
-            'surname' => $input['surname'],
-            'email' => $input['email'],
-            'password' => Hash::make($input['password']),
-        ]);
-
-        /* return DB::transaction(function () use ($input) {
-            return tap(User::create([
+        return DB::transaction(function () use ($input, $role) {
+            return tap($role->users()->create([
                 'name' => $input['name'],
                 'surname' => $input['surname'],
                 'email' => $input['email'],
                 'password' => Hash::make($input['password']),
-                'role_id' => $input['role']
             ]), function (User $user) {
                 return $user;
             });
-        }); */
+        });
     }
 
     /**
