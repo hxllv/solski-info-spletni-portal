@@ -65,7 +65,7 @@ class RoleController extends Controller
 
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255', Rule::unique('roles')],
-        ]);
+        ])->validate();
 
         DB::transaction(function () use ($input) {
             return tap(Role::create([
@@ -85,7 +85,7 @@ class RoleController extends Controller
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255', Rule::unique('roles')->ignore($role->id)],
             'middlewares' => ['exclude_if:middlewares,false', 'array']
-        ]);
+        ])->validate();
 
         $role->forceFill([
             'name' => $input['name'],

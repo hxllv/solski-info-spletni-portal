@@ -54,7 +54,11 @@ const logout = () => {
                             </div>
 
                             <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                                <NavLink :href="route('users')" :active="route().current('users')">
+                                <NavLink :href="route('users')" :active="
+                                    route().current('users') ||
+                                    route().current('roles') ||
+                                    route().current('classes')
+                                ">
                                     Admin
                                 </NavLink>
                             </div>

@@ -29,7 +29,7 @@ defineEmits(['edit', 'delete']);
                 </thead>
                 <tbody class="text-xs md:text-sm lg:text-base">
                     <tr v-for="row in data.data" class="bg-white border-b hover:bg-gray-100">
-                        <td class="px-6 py-4 border-r" v-for="propName in sortedAs">{{ row[propName] }}</td>
+                        <td class="px-6 py-4 border-r" v-for="val in sortedAs">{{ row[val] }}</td>
                         <td class="px-6 py-4 text-right max-w-max" v-if="allowEdit || allowDelete">
                             <a class="cursor-pointer" @click="$emit('edit', row.id)" v-if="allowEdit">
                                 <font-awesome-icon icon="fa-solid fa-pen" class="text-gray-700 px-2"/> 

@@ -7,17 +7,23 @@ import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
 import ActionMessage from '@/Components/ActionMessage.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
+import Select from '@/Components/Select.vue';
 
 const props = defineProps({
-    user: Object,
+    users: Array,
 });
 
 const form = useForm({
-    name: '',
+    class_name: '',
+    class_teacher: ''
 });
 
 const postNewClassData = () => {
-    console.log("yahoo")
+    form.post(route('create.class'), {
+        onSuccess: () => {
+            form.reset()
+        },
+    });
 };
 
 </script>
@@ -35,15 +41,31 @@ const postNewClassData = () => {
         <template #form>
             <!-- Name -->
             <div class="col-span-6 sm:col-span-4">
-                <InputLabel for="name" value="Naziv razreda" />
+                <InputLabel for="class_name" value="Naziv razreda" />
                 <TextInput
-                    id="name"
-                    v-model="form.name"
+                    id="class_name"
+                    v-model="form.class_name"
                     type="text"
                     class="mt-1 block w-full"
-                    autocomplete="name"
+                    autocomplete="class_name"
                 />
-                <InputError :message="form.errors.name" class="mt-2" />
+                <InputError :message="form.errors.class_name" class="mt-2" />
+            </div>
+
+            <!-- Class Teacher -->
+            <div class="col-span-6 sm:col-span-4">
+                <InputLabel for="class" value="Razrednik" />
+                <Select
+                    id="class_teacher"
+                    v-model="form.class_teacher"
+                    class="mt-1 block w-full"
+                    autocomplete="class_teacher"
+                >
+                    <option v-for="user in users" :value="user.id">
+                        {{ `${user.name} ${user.surname} - ${user.email}` }}
+                    </option>
+                </Select>
+                <InputError :message="form.errors.class_teacher" class="mt-2" />
             </div>
         </template>
 

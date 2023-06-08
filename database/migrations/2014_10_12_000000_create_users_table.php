@@ -22,6 +22,7 @@ return new class extends Migration
             $table->boolean('is_account_owner');
             $table->foreignId('current_team_id')->nullable();
             $table->foreignId('role_id');
+            $table->foreignId('school_class_id')->nullable();
             $table->timestamps();
         });
     }

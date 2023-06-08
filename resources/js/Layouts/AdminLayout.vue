@@ -40,7 +40,7 @@ router.on('finish', () => {
                 </Tab>
             </li>
             <li class="mr-2">
-                <Tab :href="route('class')" :active="route().current('class')">
+                <Tab :href="route('classes')" :active="route().current('classes')">
                     Razredi
                 </Tab>
             </li>

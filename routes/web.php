@@ -3,6 +3,7 @@
 use App\Http\Controllers\InviteController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SchoolClassController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -71,9 +72,12 @@ Route::middleware([
         Route::delete('/roles/{role}', [RoleController::class, 'destroy'])->name('role.delete');
         Route::put('/roles/{role}', [RoleController::class, 'update'])->name('role.update');
 
-        Route::get('/classes', function () {
-            return Inertia::render('Admin/Classes');
-        })->name('class');
+        // razredi
+
+        Route::get('/classes', [SchoolClassController::class, 'index'])->name('classes');
+        Route::post('/classes', [SchoolClassController::class, 'store'])->name('create.class');
+        Route::delete('/classes/{class}', [SchoolClassController::class, 'destroy'])->name('class.delete');
+        Route::put('/classes/{class}', [SchoolClassController::class, 'update'])->name('class.update');
     })->name('admin');
 });
 

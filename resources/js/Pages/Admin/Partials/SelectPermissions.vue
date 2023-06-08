@@ -79,17 +79,29 @@ const roles = {
         ...inclds('roles.view', 'roles.create', 'roles.edit', 'roles.delete')
     }
 }
+
+const classes = {
+    arr: [
+        { name: 'View', id: 'classes.view'},
+        { name: 'Create', id: 'classes.create'},
+        { name: 'Edit', id: 'classes.edit'},
+        { name: 'Delete', id: 'classes.delete'}
+    ],
+    form: {
+        ...inclds('classes.view', 'classes.create', 'classes.edit', 'classes.delete')
+    }
+}
 </script>
 
 <template>
     <div class="col-span-6 sm:col-span-4">
         <h1 class="mb-4 font-semibold text-gray-900 text-xl">Pravice</h1>
         <table class="w-full text-sm text-left text-gray-500">
-            <tr class="bg-white hover:bg-gray-50 border-b">
-                <div class="m-2 text-xl">
-                    <InputLabel for="admin.panel.view">
+            <tr class="bg-white hover:bg-gray-50">
+                <div class="m-2">
+                    <InputLabel for="admin.panel.view" textSize="text-base">
                         <div class="flex items-center">
-                            <Checkbox id="admin.panel.view" v-model:checked="form['admin.panel.view']" name="admin.panel.view" required @change="emitter"/>
+                            <Checkbox class="p-2" id="admin.panel.view" v-model:checked="form['admin.panel.view']" name="admin.panel.view" required @change="emitter"/>
                             <div class="ml-2">
                                 Admin panel
                             </div>
@@ -97,7 +109,7 @@ const roles = {
                     </InputLabel>
                 </div>
             </tr>
-            <div :class="[form['admin.panel.view'] ? '' : 'pointer-events-none opacity-30']">
+            <div :class="[form['admin.panel.view'] ? '' : 'pointer-events-none opacity-30']" class="border p-2 rounded-md shadow mb-3">
                 <h1 class="font-semibold text-gray-900 text-lg m-2">Users</h1>
                 <table class="w-full">
                     <tr class="bg-white hover:bg-gray-50">
@@ -114,7 +126,27 @@ const roles = {
                         </div>
                     </tr>
                 </table>
+                <h1 class="font-semibold text-gray-900 text-lg m-2">Classes</h1>
+                <table class="w-full">
+                    <tr class="bg-white hover:bg-gray-50">
+                        <div class="m-2 text-xl">
+                            <InlineCheckboxes :items="classes.arr" :form="classes.form" @formChange="updateForm"/>
+                        </div>
+                    </tr>
+                </table>
             </div>
+            <tr class="bg-white hover:bg-gray-50">
+                <div class="m-2">
+                    <InputLabel for="class.teacher" textSize="text-base">
+                        <div class="flex items-center">
+                            <Checkbox class="p-2" id="class.teacher" v-model:checked="form['class.teacher']" name="class.teacher" required @change="emitter"/>
+                            <div class="ml-2">
+                                Can be class teacher
+                            </div>
+                        </div>
+                    </InputLabel>
+                </div>
+            </tr>
         </table>
     </div>
 </template>
