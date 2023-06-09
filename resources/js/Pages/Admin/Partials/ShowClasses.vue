@@ -9,7 +9,6 @@ import Table from '@/Components/Table.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
-import Select from '@/Components/Select.vue';
 
 const props = defineProps({
     classes: Object,
@@ -123,6 +122,7 @@ console.log(props.classes.data)
         :allowEdit="middleware.includes('classes.edit')" :allowDelete="middleware.includes('classes.delete')" 
         @edit="openEditModal" 
         @delete="openDeleteModal"
+        detailsURL="view.class"
         :query="{ term: formFilter.term }"
         :buffer="buffer"
     />

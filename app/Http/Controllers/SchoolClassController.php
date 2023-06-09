@@ -47,6 +47,41 @@ class SchoolClassController extends Controller
         ]);
     }
 
+    public function view(SchoolClass $class): Response
+    {
+        $this->authorize('view', SchoolClass::class);
+
+        $data = request()->validate([
+            'term' => 'string|nullable',
+        ]);
+
+        $mQuery = $class->students();
+
+        $data['term'] = $data['term'] ?? '';
+
+        $mQuery->where(function ($query) use ($data) {
+            $query->where('surname', 'LIKE', '%'.$data['term'].'%')
+                ->orWhere('email', 'LIKE', '%'.$data['term'].'%')
+                ->orWhere('name', 'LIKE', '%'.$data['term'].'%');
+        });
+
+        $middlewares = auth()->user()->role->middlewares->pluck('name')->toArray();
+
+        if (auth()->user()->is_account_owner) 
+            $middlewares = Middleware::all()->pluck('name')->toArray();
+
+        return Inertia::render('Admin/Class', 
+        [
+            'sClass' => $class,
+            'classTeacher' => $class->classTeacher,
+            'users' => $mQuery->paginate(10),
+            'params' => [
+                'term' => $data['term'],
+            ],
+            'middleware' => $middlewares
+        ]);
+    }
+
     public function store(Request $request)
     {
         $this->authorize('create', SchoolClass::class);

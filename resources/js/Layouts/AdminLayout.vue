@@ -6,6 +6,8 @@ import { ref  } from 'vue';
 
 defineProps({
     title: String,
+    backButtonURL: String,
+    header: String,
 });
 
 const buffer = ref(false)
@@ -24,11 +26,11 @@ router.on('finish', () => {
     <AppLayout :title="title">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Admin
+                {{ header ? header : 'Admin' }}
             </h2>
         </template>
 
-        <ul class="m-2 max-w-7xl mt-0 sm:px-6 lg:px-8 mx-auto flex flex-wrap text-sm font-medium text-center text-gray-500">
+        <ul class="m-2 max-w-7xl mt-0 px-2 sm:px-6 lg:px-8 mx-auto flex flex-wrap text-sm font-medium text-center text-gray-500" v-if="!backButtonURL">
             <li class="mr-2">
                 <Tab :href="route('users', 1)" :active="route().current('users')">
                     Uporabniki
@@ -45,6 +47,13 @@ router.on('finish', () => {
                 </Tab>
             </li>
         </ul>
+
+        <div class="m-2 max-w-7xl mt-0 sm:px-6 lg:px-8 mx-auto flex flex-wrap ">
+            <Link class="p-2 pt-4 scale-150" :href="backButtonURL" v-if="backButtonURL">
+                <font-awesome-icon :icon="['fas', 'arrow-left']" />
+            </Link>
+        </div>
+        
 
         <div>
             <slot :buffer="buffer" />
