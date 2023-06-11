@@ -9,8 +9,10 @@ use App\Models\User;
 use Inertia\Response;
 use App\Actions\Jetstream\DeleteUser;
 use App\Models\Middleware;
+use App\Models\SchoolClass;
 use Laravel\Fortify\Contracts\ProfileInformationUpdatedResponse;
 use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -45,7 +47,8 @@ class UserController extends Controller
         return Inertia::render('Admin/Users', 
             [
                 'roles' => Role::all(),
-                'users' => $mQuery->paginate(10),
+                'classes' => SchoolClass::all(),
+                'users' => $mQuery->with(['role', 'studentOf'])->paginate(10),
                 'params' => [
                     'term' => $data['term'],
                     'role' => $data['role'],
@@ -67,6 +70,59 @@ class UserController extends Controller
         $updater->update($user, $request->all());
 
         return app(ProfileInformationUpdatedResponse::class);
+    }
+
+    public function multiupdate()
+    {
+        $this->authorize('edit', User::class);
+
+        $data = request()->validate([
+            'class' => [Rule::excludeIf(!empty(request()->input('role'))), 'numeric', 'required'],
+            'role' => [Rule::excludeIf(!empty(request()->input('class'))), 'numeric', 'required'],
+            'userIds' => 'required|array',
+        ]); 
+
+        $users = User::find($data['userIds']);
+
+        if (!empty($data['class'])) {
+            if ($data['class'] != -1 && Role::find($data['class'])->get()->count() === 0)
+                return redirect()->back()->withErrors([
+                    'class' => 'Invalid class.'
+                ]);
+
+            foreach ($users as $user) {
+                if ($data['class'] == -1) {
+                    $user->studentOf()->dissociate($data['class'])->save();
+                    continue;
+                }
+                $user->studentOf()->associate($data['class'])->save();
+            }
+        }
+        else if (!empty($data['role'])) {
+            if (Role::find($data['role'])->get()->count() === 0)
+                return redirect()->back()->withErrors([
+                    'role' => 'Invalid role group.'
+                ]);
+
+            foreach ($users as $user) {
+                $user->role()->associate($data['role'])->save();
+            }
+        }
+    }
+
+    public function multidelete()
+    {
+        $this->authorize('edit', User::class);
+
+        $data = request()->validate([
+            'userIds' => 'required|array',
+        ]); 
+
+        $users = User::find($data['userIds']);
+
+        foreach ($users as $user) {
+            $user->delete();
+        }
     }
 
     public function destroy(User $user)
