@@ -74,6 +74,7 @@ class Invite extends Notification
     {
         return URL::temporarySignedRoute('invited', now()->addDay(), [
             'role' => $this->data["role"],
+            'class' => $this->data["class"],
             'email' => $this->data["email"],
             'name' => $this->data["name"],
             'surname' => $this->data["surname"],
