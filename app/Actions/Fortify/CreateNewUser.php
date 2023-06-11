@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Validator;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
 use Laravel\Jetstream\Jetstream;
 
+use function PHPUnit\Framework\isEmpty;
+
 class CreateNewUser implements CreatesNewUsers
 {
     use PasswordValidationRules;
@@ -54,7 +56,8 @@ class CreateNewUser implements CreatesNewUsers
             'surname' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => $this->passwordRules(),
-            'role' => ['required', 'numeric']
+            'role' => ['required', 'numeric'],
+            'class' => ['required', 'numeric'],
         ])->validate();
 
         $role = Role::find($input['role']);
@@ -65,7 +68,10 @@ class CreateNewUser implements CreatesNewUsers
                 'surname' => $input['surname'],
                 'email' => $input['email'],
                 'password' => Hash::make($input['password']),
-            ]), function (User $user) {
+                'is_account_owner' => false
+            ]), function (User $user) use ($input) {
+                if (!empty($input['class']) && $$data['class'] != -1)
+                    $user->studentOf()->associate($input['class'])->save();
                 return $user;
             });
         });

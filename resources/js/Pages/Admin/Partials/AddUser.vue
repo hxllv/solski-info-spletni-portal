@@ -11,13 +11,15 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 
 const props = defineProps({
     roles: Array,
+    classes: Array
 });
 
 const form = useForm({
     name: '',
     surname: '',
     email: '',
-    role: ''
+    role: '',
+    class: ''
 });
 
 const postNewUserData = () => {
@@ -91,6 +93,21 @@ const postNewUserData = () => {
                     <option v-for="role in roles" :value="role.id">{{role.name}}</option>
                 </Select>
                 <InputError :message="form.errors.role" class="mt-2" />
+            </div>
+
+            <!-- class -->
+            <div class="col-span-6 sm:col-span-4">
+                <InputLabel for="class" value="Razred" />
+                <Select
+                    id="class"
+                    v-model="form.class"
+                    class="mt-1 block w-full"
+                    autocomplete="class"
+                >
+                    <option value="-1">/</option>
+                    <option v-for="sClass in classes" :value="sClass.id">{{sClass.class_name}}</option>
+                </Select>
+                <InputError :message="form.errors.class" class="mt-2" />
             </div>
         </template>
 

@@ -11,6 +11,7 @@ import TextInput from '@/Components/TextInput.vue';
 const props = defineProps({
     email: String,
     role: String,
+    class: String,
     name: String,
     surname: String,
     urlPost: String,

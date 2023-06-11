@@ -12,8 +12,11 @@ use App\Models\Role;
 use Laravel\Fortify\Contracts\RegisterResponse;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use App\Actions\Fortify\PasswordValidationRules;
+use App\Models\SchoolClass;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
 use Illuminate\Auth\Events\Registered;
+
+use function PHPUnit\Framework\isEmpty;
 
 class InviteController extends Controller
 {
@@ -34,7 +37,8 @@ class InviteController extends Controller
             'name' => 'required|string',
             'surname' => 'required|string',
             'email' => 'required|email',
-            'role' => 'required|numeric'
+            'role' => 'required|numeric',
+            'class' => 'required|numeric'
         ]);
 
         if (User::where('email', $data['email'])->get()->count() !== 0)
@@ -47,6 +51,11 @@ class InviteController extends Controller
                 'role' => 'Invalid role group.'
             ]);
 
+        if (!empty($data['class']) && $$data['class'] != -1 && SchoolClass::where('id', $data['class'])->get()->count() === 0)
+            return redirect()->back()->withErrors([
+                'class' => 'Invalid class.'
+            ]);
+
         Notification::route('mail', $data['email'])->notify(new Invite($data));
     }
 
@@ -54,6 +63,7 @@ class InviteController extends Controller
     {
         $email = $request->input('email');
         $role = $request->input('role');
+        $class = $request->input('class');
 
         if (User::where('email', $email)->get()->count() !== 0)
             abort(403, 'Email is already registered.');
@@ -61,6 +71,8 @@ class InviteController extends Controller
         if (Role::where('id', $role)->get()->count() === 0)
             abort(403, 'Invalid role group.');
 
+        if (!empty($class) && SchoolClass::where('id', $class)->get()->count() === 0)
+            abort(403, 'Invalid class.');
 
         event(new Registered($creator->invite($request->all())));
 
@@ -71,6 +83,7 @@ class InviteController extends Controller
     {
         $email = $request->input('email');
         $role = $request->input('role');
+        $class = $request->input('class');
         $name = $request->input('name');
         $surname = $request->input('surname');
 
@@ -79,6 +92,7 @@ class InviteController extends Controller
 
         $url = URL::temporarySignedRoute('invited', now()->addMinutes(30), [
             'role' => $role,
+            'class' => $class,
             'email' => $email,
             'name' => $name,
             'surname' => $surname,
@@ -88,6 +102,7 @@ class InviteController extends Controller
             [
                 'email' => $email,
                 'role' => $role,
+                'class' => $class,
                 'name' => $name,
                 'surname' => $surname,
                 'urlPost' => $url
