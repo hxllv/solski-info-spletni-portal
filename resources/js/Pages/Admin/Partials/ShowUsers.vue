@@ -10,10 +10,13 @@ import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
 import Select from '@/Components/Select.vue';
+import Dropdown from '@/Components/Dropdown.vue';
+import DropdownLink from '@/Components/DropdownLink.vue';
 
 const props = defineProps({
     users: Object,
     roles: Array,
+    classes: Array,
     params: Object,
     buffer: Boolean,
     middleware: Array
@@ -23,16 +26,24 @@ const confirmingUserDeletion = ref(false);
 const userEditing = ref(false);
 const userToDelete = ref(false);
 const userToEdit = ref(false);
+const selectedUsers = ref(false);
+const multiActionsClass = ref('opacity-30 pointer-events-none');
+const showMultiModal = ref(false)
 const formDelete = useForm({});
 const formEdit = useForm({
     name: '',
     surname: '',
     email: '',
-    role: ''
+    role: '',
+    class: '',
 });
 const formFilter = useForm({
     term: props.params.term,
     role: props.params.role,
+});
+const formMulti = useForm({
+    class: '',
+    role: '',
 });
 
 // deleting
@@ -84,6 +95,47 @@ const editUserData = () => {
     });
 }
 
+// multi actions
+
+const onSelectChange = (val) => {
+    selectedUsers.value = val.length > 0 ? val : false;
+
+    multiActionsClass.value = ''
+    if (!selectedUsers.value)
+        multiActionsClass.value = 'opacity-30 pointer-events-none'
+}
+
+const closeMultiModal = () => {
+    showMultiModal.value = false;
+
+    formMulti.reset()
+};
+
+const openMultiModal = (modalName) => {
+    showMultiModal.value = modalName;
+};
+
+const multiActionDo = (modalName) => {
+    console.log(modalName)
+    if (modalName === 'role' || modalName === 'class') {
+        formMulti.transform(data => ({
+            ...data,
+            userIds: selectedUsers.value
+        })).put(route('multi.user.update'), {
+            preserveScroll: true,
+            onSuccess: () => closeMultiModal(),
+        });
+    }
+    else if (modalName === 'delete') {
+        formMulti.transform(() => ({
+            userIds: selectedUsers.value
+        })).delete(route('multi.user.delete'), {
+            preserveScroll: true,
+            onSuccess: () => closeMultiModal(),
+        });
+    }
+};
+
 // preuredi podatke v users array objectih
 
 const hatedProps = ['created_at', 'current_team_id', 'email_verified_at', 'role_id', 'name', 'surname', 'two_factor_confirmed_at', 'updated_at'];
@@ -93,8 +145,8 @@ const usersMod = computed(() => {
 
     newUsers.data.forEach(user => {
         user.fullname = `${user.name} ${user.surname}`
-        user.role = props.roles.filter(role => { return role.id === user.role_id })[0].name
-        user.class = 'R1a'
+        user.role = user.role.name
+        user.class = user.student_of ? user.student_of.class_name : '/'
 
         hatedProps.forEach(prop => {
             delete user[prop]
@@ -103,9 +155,12 @@ const usersMod = computed(() => {
 
     return newUsers
 });
+
+console.log(props.classes)
 </script>
 
 <template>
+    <!-- filtering -->
     <div class="md:grid md:grid-cols-3 md:gap-6">
         <div class="mt-5 md:mt-0 md:col-span-1 p-2">
             <InputLabel for="term" value="Iskalni niz" />
@@ -133,25 +188,52 @@ const usersMod = computed(() => {
         <div class="mt-5 md:mt-0 md:col-span-1 p-2 text-right flex items-end justify-end">
             <Link preserve-scroll preserve-state :href="route('users')" :data="{ page: 1, term: '', role: '' }" class="mr-1" @click="formFilter.reset()">
                 <SecondaryButton>
-                        Reset
+                    Reset
                 </SecondaryButton>
             </Link>
 
             <Link preserve-scroll preserve-state :href="route('users')" :data="{ page: 1, term: formFilter.term, role: formFilter.role }">
                 <PrimaryButton>
-                        Apply
+                    Apply
                 </PrimaryButton>
             </Link>
         </div>
+    </div>
+
+    <!-- multi actions -->
+    <div class="md:grid md:grid-cols-3 md:gap-6">
+        <div class="mt-5 md:mt-0 md:col-span-1 p-2">
+            <Dropdown align="left" :class="multiActionsClass">
+                <template #trigger>
+                    <SecondaryButton>
+                        Akcije
+                    </SecondaryButton>
+                </template>
+                <template #content>
+                    <DropdownLink as="button" @click="openMultiModal('role')">
+                        Dodeli skupino pravic
+                    </DropdownLink>
+                    <DropdownLink as="button" @click="openMultiModal('class')">
+                        Dodeli razred
+                    </DropdownLink>
+                    <DropdownLink as="button" @click="openMultiModal('delete')">
+                        Izbriši
+                    </DropdownLink>
+                </template>
+            </Dropdown>
+        </div>
+       
     </div>
     
     <Table :data="usersMod" :headerNames="['Ime', 'Email', 'Razred', 'Skupina pravic']" 
         :sortedAs="['fullname', 'email', 'class', 'role']" 
         :allowEdit="middleware.includes('users.edit')" :allowDelete="middleware.includes('users.delete')" 
+        :allowMultiActions="true"
         @edit="openEditModal" 
         @delete="openDeleteModal"
         :query="{ term: formFilter.term, role: formFilter.role }"
         :buffer="buffer"
+        @selectedChange="onSelectChange"
     />
 
     <!-- deleting -->
@@ -246,6 +328,21 @@ const usersMod = computed(() => {
                             </Select>
                             <InputError :message="formEdit.errors.role" class="mt-2" />
                         </div>
+
+                        <!-- Role -->
+                        <div class="col-span-6 sm:col-span-4">
+                            <InputLabel for="class" value="Skupina pravic" />
+                            <Select
+                                id="class"
+                                v-model="formEdit.class"
+                                class="mt-1 block w-full"
+                                autocomplete="class"
+                            >
+                                <option value="-1">/</option>
+                                <option v-for="sClass in classes" :value="sClass.id">{{sClass.name}}</option>
+                            </Select>
+                            <InputError :message="formEdit.errors.class" class="mt-2" />
+                        </div>
                     </div>
                 </div>
             </form>
@@ -262,6 +359,94 @@ const usersMod = computed(() => {
             >
                 Save
             </PrimaryButton>
+        </template>
+    </DialogModal>
+
+    <!-- multiactions -->
+
+    <DialogModal :show="typeof showMultiModal == 'string'" @close="closeMultiModal"> 
+        <template #title v-if="showMultiModal === 'role'">
+            Dodeli skupino pravic
+        </template>
+        <template #title v-if="showMultiModal === 'class'">
+            Dodeli razred
+        </template>
+        <template #title v-if="showMultiModal === 'delete'">
+            Izbriši uporabnike
+        </template>
+
+        <template #content v-if="showMultiModal === 'role'">
+            <form @submit.prevent="">
+                <div class="px-4 py-5 bg-white sm:p-6">
+                    <div class="grid grid-cols-6 gap-6">
+                        <!-- Role -->
+                        <div class="col-span-6 sm:col-span-4">
+                            <InputLabel for="role" value="Skupina pravic" />
+                            <Select
+                                id="role"
+                                v-model="formMulti.role"
+                                class="mt-1 block w-full"
+                                autocomplete="role"
+                            >
+                                <option v-for="role in roles" :value="role.id">{{role.name}}</option>
+                            </Select>
+                            <InputError :message="formMulti.errors.role" class="mt-2" />
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </template>
+        <template #content v-if="showMultiModal === 'class'">
+            <form @submit.prevent="">
+                <div class="px-4 py-5 bg-white sm:p-6">
+                    <div class="grid grid-cols-6 gap-6">
+                        <!-- Class -->
+                        <div class="col-span-6 sm:col-span-4">
+                            <InputLabel for="class" value="Razred" />
+                            <Select
+                                id="class"
+                                v-model="formMulti.class"
+                                class="mt-1 block w-full"
+                                autocomplete="role"
+                            >
+                                <option value="-1">/</option>
+                                <option v-for="sClass in classes" :value="sClass.id">{{sClass.class_name}}</option>
+                            </Select>
+                            <InputError :message="formMulti.errors.class" class="mt-2" />
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </template>
+        <template #content v-if="showMultiModal === 'delete'">
+            Are you sure you want to delete this account? Once this account is deleted, all of its resources and data will be permanently deleted.
+
+            <InputError :message="formMulti.errors.delete" class="mt-2" />
+        </template>
+
+        <template #footer v-if="showMultiModal === 'role' || showMultiModal === 'class'">
+            <SecondaryButton @click="closeMultiModal">
+                Cancel
+            </SecondaryButton>
+
+            <PrimaryButton
+                class="ml-3"
+                @click="multiActionDo(showMultiModal)"
+            >
+                Save
+            </PrimaryButton>
+        </template>
+        <template #footer v-if="showMultiModal === 'delete'">
+            <SecondaryButton @click="closeMultiModal">
+                Cancel
+            </SecondaryButton>
+
+            <DangerButton
+                class="ml-3"
+                @click="multiActionDo(showMultiModal)"
+            >
+                Delete Account
+            </DangerButton>
         </template>
     </DialogModal>
 </template>

@@ -71,7 +71,7 @@ const selectedChange = () => {
                             </div>
                         </th>
                         <th scope="col" class="px-6 py-3 border-r" v-for="name in headerNames">{{ name }}</th>
-                        <th scope="col" class="px-6 py-3 max-w-fit" v-if="allowEdit || allowDelete"></th>
+                        <th scope="col" class="py-3 max-w-fit" v-if="allowEdit || allowDelete"></th>
                     </tr>
                 </thead>
                 <tbody class="text-xs md:text-sm lg:text-base">
