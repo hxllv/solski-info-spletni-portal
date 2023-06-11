@@ -57,13 +57,16 @@ Route::middleware([
         return Inertia::render('Dashboard');
     })->name('dashboard');
 
-    Route::prefix('admin')/* TODO: admin panel permission ->middleware('admin') */->group(function () {
+    Route::prefix('admin')->group(function () {
         // uporabniki
 
         Route::get('/users', [UserController::class, 'index'])->name('users');
         Route::post('/inviteUser', [InviteController::class, 'send'])->name('invite.user');
         Route::delete('/user/{user}', [UserController::class, 'destroy'])->name('user.delete');
         Route::put('/user/{user}', [UserController::class, 'update'])->name('user.update');
+
+        Route::put('/users/update', [UserController::class, 'multiupdate'])->name('multi.user.update');
+        Route::delete('/users/delete', [UserController::class, 'multidelete'])->name('multi.user.delete');
 
         // skupine pravic in pravice
 

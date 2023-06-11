@@ -7,6 +7,7 @@ import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
+import DialogModal from '@/Components/DialogModal.vue';
 
 const props = defineProps({
     sClass: Object,
@@ -78,6 +79,47 @@ const usersMod = computed(() => {
                     :buffer="layout.buffer"
                     @selectedChange="console.log"
                 />
+
+                <!-- todo: adding students to class -->
+                <!-- <DialogModal :show="typeof showMultiModal == 'string'" @close="closeMultiModal"> 
+                    <template #title v-if="showMultiModal === 'role'">
+                        Dodeli skupino pravic
+                    </template>
+                    <template #content v-if="showMultiModal === 'class'">
+                        <form @submit.prevent="">
+                            <div class="px-4 py-5 bg-white sm:p-6">
+                                <div class="grid grid-cols-6 gap-6">
+                                    <div class="col-span-6 sm:col-span-4">
+                                        <InputLabel for="class" value="Razred" />
+                                        <Select
+                                            id="class"
+                                            v-model="formMulti.class"
+                                            class="mt-1 block w-full"
+                                            autocomplete="role"
+                                        >
+                                            <option value="-1">/</option>
+                                            <option v-for="sClass in classes" :value="sClass.id">{{sClass.class_name}}</option>
+                                        </Select>
+                                        <InputError :message="formMulti.errors.class" class="mt-2" />
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </template>
+
+                    <template #footer v-if="showMultiModal === 'role' || showMultiModal === 'class'">
+                        <SecondaryButton @click="closeMultiModal">
+                            Cancel
+                        </SecondaryButton>
+
+                        <PrimaryButton
+                            class="ml-3"
+                            @click="multiActionDo(showMultiModal)"
+                        >
+                            Save
+                        </PrimaryButton>
+                    </template>
+                </DialogModal> -->
             </div>
         </div>
     </AdminLayout>
