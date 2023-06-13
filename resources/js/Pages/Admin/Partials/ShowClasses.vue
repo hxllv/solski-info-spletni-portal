@@ -27,8 +27,10 @@ const formEdit = useForm({
     class_name: '',
 });
 const formFilter = useForm({
-    term: props.params.term,
+    term: '',
 });
+
+formFilter.term = props.params.term
 
 // deleting
 
@@ -125,6 +127,7 @@ console.log(props.classes.data)
         detailsURL="view.class"
         :query="{ term: formFilter.term }"
         :buffer="buffer"
+        routeName="classes"
     />
 
     <!-- deleting -->

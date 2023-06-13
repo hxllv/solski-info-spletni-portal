@@ -13,12 +13,13 @@ class UserSeeder extends Seeder
     public function run(): void
     {
 
-        for ($i = 15; $i < 3000; $i++) {
+        for ($i = 15; $i < 500; $i++) {
             \App\Models\User::factory()->create([
                 "name" => "Nace$i",
                 "surname" => "Tavcer$i",
                 "email" => "nace.tavcer+$i@gmail.com",
-                "role_id" => 2
+                "role_id" => 3,
+                'is_account_owner' => false
             ]);
         }
     }

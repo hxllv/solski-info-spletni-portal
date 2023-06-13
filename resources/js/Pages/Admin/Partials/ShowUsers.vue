@@ -38,9 +38,13 @@ const formEdit = useForm({
     class: '',
 });
 const formFilter = useForm({
-    term: props.params.term,
-    role: props.params.role,
+    term: '',
+    role: ''
 });
+
+formFilter.term = props.params.term
+formFilter.role = props.params.role
+
 const formMulti = useForm({
     class: '',
     role: '',
@@ -222,7 +226,6 @@ console.log(props.classes)
                 </template>
             </Dropdown>
         </div>
-       
     </div>
     
     <Table :data="usersMod" :headerNames="['Ime', 'Email', 'Razred', 'Skupina pravic']" 
@@ -234,6 +237,7 @@ console.log(props.classes)
         :query="{ term: formFilter.term, role: formFilter.role }"
         :buffer="buffer"
         @selectedChange="onSelectChange"
+        routeName="users"
     />
 
     <!-- deleting -->

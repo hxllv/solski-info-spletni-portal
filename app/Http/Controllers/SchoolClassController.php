@@ -38,7 +38,7 @@ class SchoolClassController extends Controller
 
         return Inertia::render('Admin/Classes', 
         [
-            'classes' => $mQuery->with(['classTeacher', 'students'])->paginate(10),
+            'classes' => $mQuery->with('classTeacher')->paginate(10),
             'users' => $potentialTeachers,
             'params' => [
                 'term' => $data['term'],
@@ -53,7 +53,11 @@ class SchoolClassController extends Controller
 
         $data = request()->validate([
             'term' => 'string|nullable',
+            'term_adding' => 'string|nullable',
+            'role' => 'numeric|nullable',
         ]);
+
+        // students
 
         $mQuery = $class->students();
 
@@ -65,6 +69,23 @@ class SchoolClassController extends Controller
                 ->orWhere('name', 'LIKE', '%'.$data['term'].'%');
         });
 
+        // potential students
+
+        $nQuery = User::query();
+
+        $data['term_adding'] = $data['term_adding'] ?? '';
+        $data['role'] = $data['role'] ?? '';
+
+        $nQuery->where('school_class_id', '!=' , $class->id)->orWhereNull('school_class_id');
+        $nQuery->where(function ($query) use ($data) {
+            $query->where('surname', 'LIKE', '%'.$data['term_adding'].'%')
+                ->orWhere('email', 'LIKE', '%'.$data['term_adding'].'%')
+                ->orWhere('name', 'LIKE', '%'.$data['term_adding'].'%');
+        });
+
+        if ($data['role'] !== '') 
+            $nQuery->where('role_id', $data['role']);
+
         $middlewares = auth()->user()->role->middlewares->pluck('name')->toArray();
 
         if (auth()->user()->is_account_owner) 
@@ -74,9 +95,14 @@ class SchoolClassController extends Controller
         [
             'sClass' => $class,
             'classTeacher' => $class->classTeacher,
-            'users' => $mQuery->paginate(10),
+            'students' => $mQuery->with('role')->paginate(10),
+            'potentialStudents' => $nQuery->with(['role', 'studentOf'])->paginate(10, ['*'], 'ps_page'),
+            'roles' => Role::all(),
             'params' => [
+                'page' => request()->input('page'),
                 'term' => $data['term'],
+                'term_adding' => $data['term_adding'],
+                'role' => $data['role'],
             ],
             'middleware' => $middlewares
         ]);
@@ -113,5 +139,20 @@ class SchoolClassController extends Controller
         }
 
         $class->delete();
+    }
+
+    public function dissociate()
+    {
+        $this->authorize('edit', SchoolClass::class);
+
+        $data = request()->validate([
+            'userIds' => 'required|array',
+        ]); 
+
+        $users = User::find($data['userIds']);
+
+        foreach ($users as $student) {
+            $student->studentOf()->dissociate()->save();
+        }
     }
 }

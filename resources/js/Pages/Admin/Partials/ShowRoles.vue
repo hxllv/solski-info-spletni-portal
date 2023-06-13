@@ -29,8 +29,10 @@ const formEdit = useForm({
     name: '',
 });
 const formFilter = useForm({
-    term: props.params.term,
+    term: '',
 });
+
+formFilter.term = props.params.term
 
 // deleting
 
@@ -121,6 +123,7 @@ const formChange = (data) => {
         @delete="openDeleteModal"
         :query="{ term: formFilter.term }"
         :buffer="buffer"
+        routeName="roles"
     />
 
     <!-- deleting -->

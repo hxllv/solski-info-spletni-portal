@@ -2,7 +2,7 @@
 import Spinner from '@/Components/Spinner.vue';
 import TablePaginator from '@/Components/TablePaginator.vue';
 import Checkbox from '@/Components/Checkbox.vue';
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch, ref } from 'vue';
 import { useForm, Link } from '@inertiajs/vue3';
 
 const props = defineProps({
@@ -14,36 +14,50 @@ const props = defineProps({
     allowMultiActions: Boolean,
     detailsURL: String,
     query: Object,
-    buffer: Boolean
+    buffer: Boolean,
+    routeName: String,
+    pageName: {
+        type: String,
+        default: 'page'
+    },
+    routeParams: {
+        type: Array,
+        default: []
+    }
 });
 
 const emit = defineEmits(['edit', 'delete', 'selectedChange']);
 
-const selectAll = computed({
-    get() {
-        return false;
-    },
-
-    set(val) {
-        for (const key in idObj) {
-            idObj[key] = false
-        }
-
-        if(val) {
-            for (const key in idObj) {
-                idObj[key] = true
-            }
-        }
-
-        selectedChange()
-    },
-});
+const selectAll = ref(false)
 
 const idObj = reactive({});
 
 props.data.data.forEach(dat => {
     idObj[dat.id] = false;
 });
+
+watch(() => props.data, async (newData, oldData) => {
+    Object.keys(idObj).forEach(key => delete idObj[key]);
+    newData.data.forEach(dat => {
+        idObj[dat.id] = false;  
+    });
+
+    selectAll.value = false;
+})
+
+watch(selectAll, async (newData, oldData) => {
+    for (const key in idObj) {
+        idObj[key] = false
+    }
+
+    if(newData) {
+        for (const key in idObj) {
+            idObj[key] = true
+        }
+    }
+
+    selectedChange()
+})
 
 const selectedChange = () => {
     const asArray = Object.entries(idObj);
@@ -100,6 +114,6 @@ const selectedChange = () => {
             </table>
         </div>
 
-        <TablePaginator :query="query" :data="data" />
+        <TablePaginator :query="query" :data="data" :pageName="pageName" :routeName="routeName" :routeParams="routeParams" />
     </div>
 </template>

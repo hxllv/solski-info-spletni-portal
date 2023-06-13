@@ -5,6 +5,9 @@ import { Link } from '@inertiajs/vue3';
 const props = defineProps({
     data: Object,
     query: Object,
+    pageName: String,
+    routeName: String,
+    routeParams: Array
 });
 
 //tole je pretty bad, sam je zarad tega pagination code manj ogaben
@@ -66,19 +69,19 @@ const isAtData = (str) => {
             </div>
             <div>
                 <nav class="isolate inline-flex -space-x-px rounded-md" aria-label="Pagination">
-                    <Link preserve-scroll preserve-state :href="route('users')" :data="{ page: 1, ...query }" :class="isAt('start')" class="relative inline-flex items-center rounded-l-md px-2 py-2 ring-1 ring-inset ring-gray-300">
+                    <Link preserve-scroll preserve-state :href="route(routeName, ...routeParams)" :data="{ [pageName]: 1, ...query }" :class="isAt('start')" class="relative inline-flex items-center rounded-l-md px-2 py-2 ring-1 ring-inset ring-gray-300">
                         <span class="sr-only">Previous</span>
                         <font-awesome-icon icon="fa-solid fa-chevron-left" class="py-1" />
                         <font-awesome-icon icon="fa-solid fa-chevron-left" class="py-1" />
                     </Link>
-                    <Link preserve-scroll preserve-state :href="route('users')" :data="{ page: isAtData('start'), ...query }" :class="isAt('start')" class="relative inline-flex items-center px-2 py-2 ring-1 ring-inset ring-gray-300">
+                    <Link preserve-scroll preserve-state :href="route(routeName, ...routeParams)" :data="{ [pageName]: isAtData('start'), ...query }" :class="isAt('start')" class="relative inline-flex items-center px-2 py-2 ring-1 ring-inset ring-gray-300">
                         <span class="sr-only">Previous</span>
                         <font-awesome-icon icon="fa-solid fa-chevron-left" class="p-1" />
                     </Link>
 
                     <!-- ce mamo manj kot 6 strani -->
                     <template v-if="data.last_page < 6" v-for="(value, index) in Array(data.last_page)">
-                        <Link preserve-scroll preserve-state :href="route('users')" :data="{ page: index + 1, ...query }" :class="getClass(index + 1)">
+                        <Link preserve-scroll preserve-state :href="route(routeName, ...routeParams)" :data="{ [pageName]: index + 1, ...query }" :class="getClass(index + 1)">
                             {{ index + 1 }}
                         </Link>
                     </template>
@@ -86,29 +89,29 @@ const isAtData = (str) => {
                     <!-- ce mamo vec -->
                     <template v-if="data.last_page >= 6">
                         <template v-if="data.current_page <= 3" v-for="val in helperArrays.first5">
-                            <Link preserve-scroll preserve-state :href="route('users')" :data="{ page: val, ...query }" :class="getClass(val)">
+                            <Link preserve-scroll preserve-state :href="route(routeName, ...routeParams)" :data="{ [pageName]: val, ...query }" :class="getClass(val)">
                                 {{ val }}
                             </Link>
                         </template>
 
                         <template v-if="data.current_page > 3 && data.current_page < data.last_page - 2" v-for="val in helperArrays.minus2toPlus2">
-                            <Link preserve-scroll preserve-state :href="route('users')" :data="{ page: val, ...query }" :class="getClass(val)">
+                            <Link preserve-scroll preserve-state :href="route(routeName, ...routeParams)" :data="{ [pageName]: val, ...query }" :class="getClass(val)">
                                 {{ val }}
                             </Link>
                         </template>
 
                         <template v-if="data.current_page >= data.last_page - 2" v-for="val in helperArrays.last5">
-                            <Link preserve-scroll preserve-state :href="route('users')" :data="{ page: val, ...query }" :class="getClass(val)">
+                            <Link preserve-scroll preserve-state :href="route(routeName, ...routeParams)" :data="{ [pageName]: val, ...query }" :class="getClass(val)">
                                 {{ val }}
                             </Link>
                         </template>
                     </template>
 
-                    <Link preserve-scroll preserve-state :href="route('users')" :data="{ page: isAtData('end'), ...query }" :class="isAt('end')" class="relative inline-flex items-center px-2 py-2 ring-1 ring-inset ring-gray-300">
+                    <Link preserve-scroll preserve-state :href="route(routeName, ...routeParams)" :data="{ [pageName]: isAtData('end'), ...query }" :class="isAt('end')" class="relative inline-flex items-center px-2 py-2 ring-1 ring-inset ring-gray-300">
                         <span class="sr-only">Previous</span>
                         <font-awesome-icon icon="fa-solid fa-chevron-right" class="p-1" />
                     </Link>
-                    <Link preserve-scroll preserve-state :href="route('users')" :data="{ page: data.last_page, ...query }" :class="isAt('end')" class="relative inline-flex items-center rounded-r-md px-2 py-2 ring-1 ring-inset ring-gray-300">
+                    <Link preserve-scroll preserve-state :href="route(routeName, ...routeParams)" :data="{ [pageName]: data.last_page, ...query }" :class="isAt('end')" class="relative inline-flex items-center rounded-r-md px-2 py-2 ring-1 ring-inset ring-gray-300">
                         <span class="sr-only">Previous</span>
                         <font-awesome-icon icon="fa-solid fa-chevron-right" class="py-1" />
                         <font-awesome-icon icon="fa-solid fa-chevron-right" class="py-1" />
