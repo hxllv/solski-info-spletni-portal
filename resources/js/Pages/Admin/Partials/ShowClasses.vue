@@ -25,6 +25,7 @@ const itemToEdit = ref(false);
 const formDelete = useForm({});
 const formEdit = useForm({
     class_name: '',
+    class_teacher: ''
 });
 const formFilter = useForm({
     term: '',
@@ -180,6 +181,21 @@ console.log(props.classes.data)
                             />
                             <InputError :message="formEdit.errors.class_name" class="mt-2" />
                         </div>
+                    </div>
+                    <!-- Class Teacher -->
+                    <div class="col-span-6 sm:col-span-4">
+                        <InputLabel for="class" value="Razrednik" />
+                        <Select
+                            id="class_teacher"
+                            v-model="formEdit.class_teacher"
+                            class="mt-1 block w-full"
+                            autocomplete="class_teacher"
+                        >
+                            <option v-for="user in users" :value="user.id">
+                                {{ `${user.name} ${user.surname} - ${user.email}` }}
+                            </option>
+                        </Select>
+                        <InputError :message="formEdit.errors.class_teacher" class="mt-2" />
                     </div>
                 </div>
             </form>

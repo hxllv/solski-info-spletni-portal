@@ -92,8 +92,9 @@ const onSelectChange = (val) => {
 
 const dissociateUsers = () => {
     formDissociate.transform(() => ({
-        userIds: selectedUsers.value
-    })).delete(route('class.dissociate'), {
+        userIds: selectedUsers.value,
+        class: -1
+    })).put(route('multi.user.update'), {
         preserveScroll: true,
     });
 };

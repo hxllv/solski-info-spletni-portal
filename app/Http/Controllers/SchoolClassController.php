@@ -140,19 +140,4 @@ class SchoolClassController extends Controller
 
         $class->delete();
     }
-
-    public function dissociate()
-    {
-        $this->authorize('edit', SchoolClass::class);
-
-        $data = request()->validate([
-            'userIds' => 'required|array',
-        ]); 
-
-        $users = User::find($data['userIds']);
-
-        foreach ($users as $student) {
-            $student->studentOf()->dissociate()->save();
-        }
-    }
 }

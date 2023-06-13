@@ -81,7 +81,6 @@ Route::middleware([
         Route::get('/classes/{class}', [SchoolClassController::class, 'view'])->name('view.class');
         Route::post('/classes', [SchoolClassController::class, 'store'])->name('create.class');
         Route::delete('/classes/{class}', [SchoolClassController::class, 'destroy'])->name('class.delete');
-        Route::delete('/classes', [SchoolClassController::class, 'dissociate'])->name('class.dissociate');
         Route::put('/classes/{class}', [SchoolClassController::class, 'update'])->name('class.update');
     })->name('admin');
 });
