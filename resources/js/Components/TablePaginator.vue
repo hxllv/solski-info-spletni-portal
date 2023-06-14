@@ -54,7 +54,7 @@ const isAtData = (str) => {
 </script>
 
 <template>
-    <div class="flex items-center justify-between border-gray-200 bg-white px-4 py-3 sm:px-6 col-span-3  sm:rounded-b-md">
+    <div class="flex items-center justify-between border-gray-200 bg-white px-4 py-3 sm:px-6 col-span-3 sm:rounded-b-md">
         <div class="flex flex-1 items-center justify-between">
             <div class="hidden sm:block">
                 <p class="text-sm text-gray-700">
