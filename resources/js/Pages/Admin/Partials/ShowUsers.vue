@@ -89,6 +89,7 @@ const openEditModal = (id) => {
     formEdit.surname = userTemp.surname
     formEdit.email = userTemp.email
     formEdit.role = String(userTemp.role_id)
+    formEdit.class = String(userTemp.school_class_id ? userTemp.school_class_id : -1)
 };
 
 const editUserData = () => {
@@ -120,7 +121,6 @@ const openMultiModal = (modalName) => {
 };
 
 const multiActionDo = (modalName) => {
-    console.log(modalName)
     if (modalName === 'role' || modalName === 'class') {
         formMulti.transform(data => ({
             ...data,
@@ -159,8 +159,6 @@ const usersMod = computed(() => {
 
     return newUsers
 });
-
-console.log(props.classes)
 </script>
 
 <template>
@@ -333,9 +331,9 @@ console.log(props.classes)
                             <InputError :message="formEdit.errors.role" class="mt-2" />
                         </div>
 
-                        <!-- Role -->
+                        <!-- Class -->
                         <div class="col-span-6 sm:col-span-4">
-                            <InputLabel for="class" value="Skupina pravic" />
+                            <InputLabel for="class" value="Razred" />
                             <Select
                                 id="class"
                                 v-model="formEdit.class"
@@ -343,7 +341,7 @@ console.log(props.classes)
                                 autocomplete="class"
                             >
                                 <option value="-1">/</option>
-                                <option v-for="sClass in classes" :value="sClass.id">{{sClass.name}}</option>
+                                <option v-for="sClass in classes" :value="sClass.id">{{sClass.class_name}}</option>
                             </Select>
                             <InputError :message="formEdit.errors.class" class="mt-2" />
                         </div>

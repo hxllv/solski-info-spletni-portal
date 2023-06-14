@@ -9,6 +9,7 @@ import Table from '@/Components/Table.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
+import Select from '@/Components/Select.vue';
 
 const props = defineProps({
     classes: Object,
@@ -66,14 +67,14 @@ const openEditModal = (id) => {
     editing.value = true;
     itemToEdit.value = id;
 
-    const dataTemp = props.classes.data.filter(classs => { return classs.id === id })[0]
+    const classTemp = props.classes.data.filter(sClass => { return sClass.id === id })[0]
 
-    formEdit.name = dataTemp.name
+    formEdit.class_name = classTemp.class_name
+    formEdit.class_teacher = String(classTemp.class_teacher.id)
 };
 
 const editItemData = () => {
     formEdit.put(route('class.update', itemToEdit.value), {
-        errorBag: '',
         preserveScroll: true,
         onSuccess: () => closeEditModal(),
         onError: () => {},
@@ -89,8 +90,6 @@ const classesMod = computed(() => {
 
     return newClasses
 });
-
-console.log(props.classes.data)
 </script>
 
 <template>
@@ -168,8 +167,8 @@ console.log(props.classes.data)
                 <div
                     class="px-4 py-5 bg-white sm:p-6"
                 >
-                    <!-- Name -->
                     <div class="grid grid-cols-6 gap-6">
+                        <!-- Name -->
                         <div class="col-span-6 sm:col-span-4">
                             <InputLabel for="class_name" value="Naziv" />
                             <TextInput
@@ -181,21 +180,21 @@ console.log(props.classes.data)
                             />
                             <InputError :message="formEdit.errors.class_name" class="mt-2" />
                         </div>
-                    </div>
-                    <!-- Class Teacher -->
-                    <div class="col-span-6 sm:col-span-4">
-                        <InputLabel for="class" value="Razrednik" />
-                        <Select
-                            id="class_teacher"
-                            v-model="formEdit.class_teacher"
-                            class="mt-1 block w-full"
-                            autocomplete="class_teacher"
-                        >
-                            <option v-for="user in users" :value="user.id">
-                                {{ `${user.name} ${user.surname} - ${user.email}` }}
-                            </option>
-                        </Select>
-                        <InputError :message="formEdit.errors.class_teacher" class="mt-2" />
+                        <!-- Class Teacher -->
+                        <div class="col-span-6 sm:col-span-4">
+                            <InputLabel for="class" value="Razrednik" />
+                            <Select
+                                id="class_teacher"
+                                v-model="formEdit.class_teacher"
+                                class="mt-1 block w-full"
+                                autocomplete="class_teacher"
+                            >
+                                <option v-for="user in users" :value="user.id">
+                                    {{ `${user.name} ${user.surname} - ${user.email}` }}
+                                </option>
+                            </Select>
+                            <InputError :message="formEdit.errors.class_teacher" class="mt-2" />
+                        </div>
                     </div>
                 </div>
             </form>

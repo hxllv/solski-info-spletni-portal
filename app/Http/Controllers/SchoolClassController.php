@@ -53,8 +53,9 @@ class SchoolClassController extends Controller
 
         $data = request()->validate([
             'term' => 'string|nullable',
-            'term_adding' => 'string|nullable',
             'role' => 'numeric|nullable',
+            'term_adding' => 'string|nullable',
+            'role_adding' => 'numeric|nullable',
         ]);
 
         // students
@@ -62,6 +63,7 @@ class SchoolClassController extends Controller
         $mQuery = $class->students();
 
         $data['term'] = $data['term'] ?? '';
+        $data['role'] = $data['role'] ?? '';
 
         $mQuery->where(function ($query) use ($data) {
             $query->where('surname', 'LIKE', '%'.$data['term'].'%')
@@ -69,12 +71,15 @@ class SchoolClassController extends Controller
                 ->orWhere('name', 'LIKE', '%'.$data['term'].'%');
         });
 
+        if ($data['role'] !== '') 
+            $mQuery->where('role_id', $data['role']);
+
         // potential students
 
         $nQuery = User::query();
 
         $data['term_adding'] = $data['term_adding'] ?? '';
-        $data['role'] = $data['role'] ?? '';
+        $data['role_adding'] = $data['role_adding'] ?? '';
 
         $nQuery->where('school_class_id', '!=' , $class->id)->orWhereNull('school_class_id');
         $nQuery->where(function ($query) use ($data) {
@@ -83,8 +88,8 @@ class SchoolClassController extends Controller
                 ->orWhere('name', 'LIKE', '%'.$data['term_adding'].'%');
         });
 
-        if ($data['role'] !== '') 
-            $nQuery->where('role_id', $data['role']);
+        if ($data['role_adding'] !== '') 
+            $nQuery->where('role_id', $data['role_adding']);
 
         $middlewares = auth()->user()->role->middlewares->pluck('name')->toArray();
 
@@ -103,6 +108,7 @@ class SchoolClassController extends Controller
                 'term' => $data['term'],
                 'term_adding' => $data['term_adding'],
                 'role' => $data['role'],
+                'role_adding' => $data['role_adding'],
             ],
             'middleware' => $middlewares
         ]);
@@ -128,6 +134,24 @@ class SchoolClassController extends Controller
                 return $class;
             });
         });
+    }
+
+    public function update(SchoolClass $class, Request $request)
+    {
+        $this->authorize('edit', SchoolClass::class);
+
+        $input = $request->all();
+
+        Validator::make($input, [
+            'class_name' => ['required', 'string', 'max:255', Rule::unique('school_classes')->ignore($class->id)],
+            'class_teacher' => ['required', 'numeric'],
+        ])->validate();
+
+        $class->forceFill([
+            'class_name' => $input['class_name'],
+        ]);
+
+        $class->classTeacher()->associate($input['class_teacher'])->save();
     }
 
     public function destroy(SchoolClass $class)

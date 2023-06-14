@@ -28,12 +28,15 @@ const multiActionsClass = ref('opacity-30 pointer-events-none');
 
 const formFilter = useForm({
     term: '',
+    role: ''
 });
 
 formFilter.term = props.params.term
+formFilter.role = props.params.role
+
 const formFilterAdding = useForm({
     term_adding: props.params.term_adding,
-    role: props.params.role,
+    role_adding: props.params.role_adding,
 });
 const formDissociate = useForm({});
 const formAssociate = useForm({});
@@ -56,7 +59,8 @@ const closeAddingModal = () => {
         route('view.class', props.sClass.id), 
         {
             page: props.params.page, 
-            term: props.params.term
+            term: props.params.term,
+            role: props.params.role,
         },
         {
             preserveState: true,
@@ -133,9 +137,6 @@ const usersModAdding = computed(() => {
 
     return newUsers
 });
-
-console.log(usersMod.value)
-console.log(usersModAdding.value)
 </script>
 
 <template>
@@ -157,14 +158,27 @@ console.log(usersModAdding.value)
                             autocomplete="term"
                         />
                     </div>
-                    <div class="mt-5 md:mt-0 md:col-span-2 p-2 text-right flex items-end justify-end">
-                        <Link preserve-scroll preserve-state :href="route('view.class', sClass.id)" :data="{ page: 1, term: '' }" class="mr-1" @click="formFilter.reset()">
+                    <div class="mt-5 md:mt-0 md:col-span-1 p-2">
+                        <InputLabel for="roleFilter" value="Skupina pravic" />
+                        <Select
+                            id="roleFilter"
+                            v-model="formFilter.role"
+                            class="mt-1 block w-full"
+                            autocomplete="role"
+                            :defaultValue="''"
+                        >
+                            <option value="">Vsi</option>
+                            <option v-for="role in roles" :value="role.id">{{role.name}}</option>
+                        </Select>
+                    </div>
+                    <div class="mt-5 md:mt-0 md:col-span-1 p-2 text-right flex items-end justify-end">
+                        <Link preserve-scroll preserve-state :href="route('view.class', sClass.id)" :data="{ page: 1, term: '', role: '' }" class="mr-1" @click="formFilter.reset()">
                             <SecondaryButton>
                                 Reset
                             </SecondaryButton>
                         </Link>
 
-                        <Link preserve-scroll preserve-state :href="route('view.class', sClass.id)" :data="{ page: 1, term: formFilter.term }">
+                        <Link preserve-scroll preserve-state :href="route('view.class', sClass.id)" :data="{ page: 1, term: formFilter.term, role: formFilter.role }">
                             <PrimaryButton>
                                 Apply
                             </PrimaryButton>
@@ -187,7 +201,7 @@ console.log(usersModAdding.value)
                 <Table :data="usersMod" :headerNames="['Ime', 'Email', 'Skupina pravic']" 
                     :sortedAs="['fullname', 'email', 'role']" 
                     :allowEdit="false" :allowDelete="false" :allowMultiActions="true"
-                    :query="{ term: formFilter.term }"
+                    :query="{ term: formFilter.term, role: formFilter.role }"
                     :buffer="layout.buffer"
                     @selectedChange="onSelectChange"
                     routeName="view.class"
@@ -215,7 +229,7 @@ console.log(usersModAdding.value)
                                 <InputLabel for="roleFilter" value="Skupina pravic" />
                                 <Select
                                     id="roleFilter"
-                                    v-model="formFilterAdding.role"
+                                    v-model="formFilterAdding.role_adding"
                                     class="mt-1 block w-full"
                                     autocomplete="role"
                                     :defaultValue="''"
@@ -225,13 +239,13 @@ console.log(usersModAdding.value)
                                 </Select>
                             </div>
                             <div class="mt-5 md:mt-0 md:col-span-1 p-2 text-right flex items-end justify-end">
-                                <Link preserve-scroll preserve-state :href="route('view.class', sClass.id)" :data="{ ps_page: 1, term_adding: '', role: '' }" class="mr-1" @click="formFilterAdding.reset()">
+                                <Link preserve-scroll preserve-state :href="route('view.class', sClass.id)" :data="{ page: props.params.page, ps_page: 1, term_adding: '', role_adding: '' }" class="mr-1" @click="formFilterAdding.reset()">
                                     <SecondaryButton>
                                         Reset
                                     </SecondaryButton>
                                 </Link>
 
-                                <Link preserve-scroll preserve-state :href="route('view.class', sClass.id)" :data="{ ps_page: 1, term_adding: formFilterAdding.term_adding, role: formFilterAdding.role }">
+                                <Link preserve-scroll preserve-state :href="route('view.class', sClass.id)" :data="{ page: props.params.page, ps_page: 1, term_adding: formFilterAdding.term_adding, role_adding: formFilterAdding.role_adding }">
                                     <PrimaryButton>
                                         Apply
                                     </PrimaryButton>
@@ -241,7 +255,7 @@ console.log(usersModAdding.value)
                         <Table :data="usersModAdding" :headerNames="['Ime', 'Email', 'Skupina pravic', 'Razred']" 
                             :sortedAs="['fullname', 'email', 'role', 'class']" 
                             :allowEdit="false" :allowDelete="false" :allowMultiActions="true"
-                            :query="{ term: formFilter.term, term_adding: formFilterAdding.term_adding, role: formFilterAdding.role }"
+                            :query="{ page: props.params.page, term: formFilter.term, role: formFilter.role, term_adding: formFilterAdding.term_adding, role_adding: formFilterAdding.role_adding }"
                             :buffer="layout.buffer"
                             @selectedChange="onAddingSelectChange"
                             pageName="ps_page"
