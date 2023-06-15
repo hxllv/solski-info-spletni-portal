@@ -8,7 +8,7 @@ use App\Models\Role;
 use App\Models\User;
 use Inertia\Response;
 use App\Actions\Jetstream\DeleteUser;
-use App\Models\Middleware;
+use App\Models\Permission;
 use App\Models\SchoolClass;
 use Laravel\Fortify\Contracts\ProfileInformationUpdatedResponse;
 use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
@@ -39,11 +39,12 @@ class UserController extends Controller
         if ($data['role'] !== '') 
             $mQuery->where('role_id', $data['role']);
 
-        $middlewares = auth()->user()->role->middlewares->pluck('name')->toArray();
+        $permissions = auth()->user()->role->permissions->pluck('name')->toArray();
 
         if (auth()->user()->is_account_owner) 
-            $middlewares = Middleware::all()->pluck('name')->toArray();
+            $permissions = Permission::all()->pluck('name')->toArray();
 
+        //dd($mQuery->paginate(10));
         return Inertia::render('Admin/Users', 
             [
                 'roles' => Role::all(),
@@ -53,7 +54,7 @@ class UserController extends Controller
                     'term' => $data['term'],
                     'role' => $data['role'],
                 ],
-                'middleware' => $middlewares
+                'permission' => $permissions
             ]
         );
     }

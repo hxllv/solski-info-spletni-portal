@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('middleware', function (Blueprint $table) {
-            $table->string('name')->primary();
+        Schema::create('permission_role', function (Blueprint $table) {
+            $table->string('permission_name');
+            $table->integer('role_id');
             $table->timestamps();
         });
     }
@@ -22,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('middleware');
+        Schema::dropIfExists('permission_role');
     }
 };

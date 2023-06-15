@@ -105,7 +105,7 @@ const postNewUserData = () => {
                     autocomplete="class"
                 >
                     <option value="-1">/</option>
-                    <option v-for="sClass in classes" :value="sClass.id">{{sClass.class_name}}</option>
+                    <option v-for="sClass in classes" :value="sClass.id">{{sClass.name}}</option>
                 </Select>
                 <InputError :message="form.errors.class" class="mt-2" />
             </div>

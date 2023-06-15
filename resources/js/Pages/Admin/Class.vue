@@ -17,7 +17,7 @@ const props = defineProps({
     roles: Array,
     students: Object,
     params: Object,
-    middleware: Array,
+    permission: Array,
 });
 
 const addingUsers = ref(false);
@@ -128,7 +128,7 @@ const usersModAdding = computed(() => {
     newUsers.data.forEach(user => {
         user.fullname = `${user.name} ${user.surname}`
         user.role = user.role.name
-        user.class = user.student_of ? user.student_of.class_name : '/'
+        user.class = user.student_of ? user.student_of.name : '/'
 
         hatedProps.forEach(prop => {
             delete user[prop]
@@ -140,7 +140,7 @@ const usersModAdding = computed(() => {
 </script>
 
 <template>
-    <AdminLayout title="Dashboard" :backButtonURL="route('classes')" :header="`Učenci razreda ${sClass.class_name}`" v-slot="layout">
+    <AdminLayout title="Dashboard" :backButtonURL="route('classes')" :header="`Učenci razreda ${sClass.name}`" v-slot="layout">
         <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
             <div>
                 <h2 class="pb-6 px-2 text-xl text-gray-800 leading-tight">

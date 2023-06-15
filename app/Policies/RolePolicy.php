@@ -17,28 +17,28 @@ class RolePolicy
 
     public function view(User $user): Response
     {
-        return ($user->role->middlewares->find('roles.view') || $user->is_account_owner) ? 
+        return ($user->role->permissions->find('roles.view') || $user->is_account_owner) ? 
             Response::allow() : 
             Response::denyWithStatus(403);
     }
 
     public function create(User $user): Response
     {
-        return ($user->role->middlewares->find('roles.create') || $user->is_account_owner) ? 
+        return ($user->role->permissions->find('roles.create') || $user->is_account_owner) ? 
             Response::allow() : 
             Response::denyWithStatus(403);
     }
 
     public function edit(User $user): Response
     {
-        return ($user->role->middlewares->find('roles.edit') || $user->is_account_owner) ? 
+        return ($user->role->permissions->find('roles.edit') || $user->is_account_owner) ? 
             Response::allow() : 
             Response::denyWithStatus(403);
     }
 
     public function delete(User $user): Response
     {
-        return ($user->role->middlewares->find('roles.delete') || $user->is_account_owner) ? 
+        return ($user->role->permissions->find('roles.delete') || $user->is_account_owner) ? 
             Response::allow() : 
             Response::denyWithStatus(403);
     }

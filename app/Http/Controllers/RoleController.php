@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Middleware;
+use App\Models\Permission;
 use App\Models\Role;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -13,10 +13,10 @@ use Illuminate\Support\Facades\DB;
 
 class RoleController extends Controller
 {
-    readonly array $adminPanelSubMiddlewares;
+    readonly array $adminPanelSubPermissions;
 
     public function __construct() {
-        $this->adminPanelSubMiddlewares = [
+        $this->adminPanelSubPermissions = [
             'users.view',
             'users.invite',
             'users.edit',
@@ -42,18 +42,18 @@ class RoleController extends Controller
 
         $mQuery->where('name', 'LIKE', '%'.$data['term'].'%');
 
-        $middlewares = auth()->user()->role->middlewares->pluck('name')->toArray();
+        $permissions = auth()->user()->role->permissions->pluck('name')->toArray();
 
         if (auth()->user()->is_account_owner) 
-            $middlewares = Middleware::all()->pluck('name')->toArray();
+            $permissions = Permission::all()->pluck('name')->toArray();
 
         return Inertia::render('Admin/Roles', 
         [
-            'roles' => $mQuery->with('middlewares')->paginate(10),
+            'roles' => $mQuery->with('permissions')->paginate(10),
             'params' => [
                 'term' => $data['term'],
             ],
-            'middleware' => $middlewares
+            'permission' => $permissions
         ]);
     }
 
@@ -84,24 +84,24 @@ class RoleController extends Controller
 
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255', Rule::unique('roles')->ignore($role->id)],
-            'middlewares' => ['exclude_if:middlewares,false', 'array']
+            'permissions' => ['exclude_if:permissions,false', 'array']
         ])->validate();
 
         $role->forceFill([
             'name' => $input['name'],
         ]);
 
-        $middlewares = $input['middlewares'];
+        $permissions = $input['permissions'];
 
-        if (!$middlewares)
+        if (!$permissions)
             return;
 
-        $role->middlewares()->attach(array_keys($middlewares, true));
-        $role->middlewares()->detach(array_keys($middlewares, false));
+        $role->permissions()->attach(array_keys($permissions, true));
+        $role->permissions()->detach(array_keys($permissions, false));
 
-        if (!$middlewares['admin.panel.view']) {
-            $role->middlewares()->detach('admin.panel.view');
-            $role->middlewares()->detach($this->adminPanelSubMiddlewares);
+        if (!$permissions['admin.panel.view']) {
+            $role->permissions()->detach('admin.panel.view');
+            $role->permissions()->detach($this->adminPanelSubPermissions);
         }
 
         $role->save();

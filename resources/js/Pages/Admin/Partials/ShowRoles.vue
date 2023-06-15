@@ -15,7 +15,7 @@ const props = defineProps({
     roles: Object,
     params: Object,
     buffer: Boolean,
-    middleware: Array
+    permission: Array
 });
 
 const permissionsForItem = ref(false);
@@ -23,7 +23,7 @@ const confirmingDeletion = ref(false);
 const editing = ref(false);
 const itemToDelete = ref(false);
 const itemToEdit = ref(false);
-let formPermissions = ref(false);
+const formPermissions = ref(false);
 const formDelete = useForm({});
 const formEdit = useForm({
     name: '',
@@ -68,7 +68,7 @@ const openEditModal = (id) => {
     itemToEdit.value = id;
 
     const roleTemp = props.roles.data.filter(role => { return role.id === id })[0]
-    permissionsForItem.value = roleTemp.middlewares.map(mw => mw.name)
+    permissionsForItem.value = roleTemp.permissions.map(mw => mw.name)
 
     formEdit.name = roleTemp.name
 };
@@ -76,7 +76,7 @@ const openEditModal = (id) => {
 const editItemData = () => {
     formEdit.transform(data => ({
         ...data,
-        middlewares: formPermissions.value
+        permissions: formPermissions.value
     })).put(route('role.update', itemToEdit.value), {
         preserveScroll: true,
         onSuccess: () => closeEditModal(),
@@ -118,7 +118,7 @@ const formChange = (data) => {
     
     <Table :data="roles" :headerNames="['Ime']" 
         :sortedAs="['name']" 
-        :allowEdit="middleware.includes('roles.edit')" :allowDelete="middleware.includes('roles.delete')" 
+        :allowEdit="permission.includes('roles.edit')" :allowDelete="permission.includes('roles.delete')" 
         @edit="openEditModal" 
         @delete="openDeleteModal"
         :query="{ term: formFilter.term }"

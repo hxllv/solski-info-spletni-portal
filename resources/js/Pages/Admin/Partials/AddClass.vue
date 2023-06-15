@@ -14,7 +14,7 @@ const props = defineProps({
 });
 
 const form = useForm({
-    class_name: '',
+    name: '',
     class_teacher: ''
 });
 
@@ -41,15 +41,15 @@ const postNewClassData = () => {
         <template #form>
             <!-- Name -->
             <div class="col-span-6 sm:col-span-4">
-                <InputLabel for="class_name" value="Naziv razreda" />
+                <InputLabel for="name" value="Naziv razreda" />
                 <TextInput
-                    id="class_name"
-                    v-model="form.class_name"
+                    id="name"
+                    v-model="form.name"
                     type="text"
                     class="mt-1 block w-full"
-                    autocomplete="class_name"
+                    autocomplete="name"
                 />
-                <InputError :message="form.errors.class_name" class="mt-2" />
+                <InputError :message="form.errors.name" class="mt-2" />
             </div>
 
             <!-- Class Teacher -->

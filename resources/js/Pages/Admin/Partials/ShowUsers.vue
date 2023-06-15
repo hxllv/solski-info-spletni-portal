@@ -19,7 +19,7 @@ const props = defineProps({
     classes: Array,
     params: Object,
     buffer: Boolean,
-    middleware: Array
+    permission: Array
 });
 
 const confirmingUserDeletion = ref(false);
@@ -150,7 +150,7 @@ const usersMod = computed(() => {
     newUsers.data.forEach(user => {
         user.fullname = `${user.name} ${user.surname}`
         user.role = user.role.name
-        user.class = user.student_of ? user.student_of.class_name : '/'
+        user.class = user.student_of ? user.student_of.name : '/'
 
         hatedProps.forEach(prop => {
             delete user[prop]
@@ -228,7 +228,7 @@ const usersMod = computed(() => {
     
     <Table :data="usersMod" :headerNames="['Ime', 'Email', 'Razred', 'Skupina pravic']" 
         :sortedAs="['fullname', 'email', 'class', 'role']" 
-        :allowEdit="middleware.includes('users.edit')" :allowDelete="middleware.includes('users.delete')" 
+        :allowEdit="permission.includes('users.edit')" :allowDelete="permission.includes('users.delete')" 
         :allowMultiActions="true"
         @edit="openEditModal" 
         @delete="openDeleteModal"
@@ -341,7 +341,7 @@ const usersMod = computed(() => {
                                 autocomplete="class"
                             >
                                 <option value="-1">/</option>
-                                <option v-for="sClass in classes" :value="sClass.id">{{sClass.class_name}}</option>
+                                <option v-for="sClass in classes" :value="sClass.id">{{sClass.name}}</option>
                             </Select>
                             <InputError :message="formEdit.errors.class" class="mt-2" />
                         </div>
@@ -412,7 +412,7 @@ const usersMod = computed(() => {
                                 autocomplete="role"
                             >
                                 <option value="-1">/</option>
-                                <option v-for="sClass in classes" :value="sClass.id">{{sClass.class_name}}</option>
+                                <option v-for="sClass in classes" :value="sClass.id">{{sClass.name}}</option>
                             </Select>
                             <InputError :message="formMulti.errors.class" class="mt-2" />
                         </div>

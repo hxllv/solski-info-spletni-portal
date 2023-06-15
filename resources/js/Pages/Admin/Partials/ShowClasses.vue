@@ -16,7 +16,7 @@ const props = defineProps({
     users: Array,
     params: Object,
     buffer: Boolean,
-    middleware: Array
+    permission: Array
 });
 
 const confirmingDeletion = ref(false);
@@ -25,7 +25,7 @@ const itemToDelete = ref(false);
 const itemToEdit = ref(false);
 const formDelete = useForm({});
 const formEdit = useForm({
-    class_name: '',
+    name: '',
     class_teacher: ''
 });
 const formFilter = useForm({
@@ -69,7 +69,7 @@ const openEditModal = (id) => {
 
     const classTemp = props.classes.data.filter(sClass => { return sClass.id === id })[0]
 
-    formEdit.class_name = classTemp.class_name
+    formEdit.name = classTemp.name
     formEdit.class_teacher = String(classTemp.class_teacher.id)
 };
 
@@ -120,8 +120,8 @@ const classesMod = computed(() => {
     </div>
     
     <Table :data="classesMod" :headerNames="['Naziv', 'Razrednik']" 
-        :sortedAs="['class_name', 'fullname']" 
-        :allowEdit="middleware.includes('classes.edit')" :allowDelete="middleware.includes('classes.delete')" 
+        :sortedAs="['name', 'fullname']" 
+        :allowEdit="permission.includes('classes.edit')" :allowDelete="permission.includes('classes.delete')" 
         @edit="openEditModal" 
         @delete="openDeleteModal"
         detailsURL="view.class"
@@ -170,15 +170,15 @@ const classesMod = computed(() => {
                     <div class="grid grid-cols-6 gap-6">
                         <!-- Name -->
                         <div class="col-span-6 sm:col-span-4">
-                            <InputLabel for="class_name" value="Naziv" />
+                            <InputLabel for="name" value="Naziv" />
                             <TextInput
-                                id="class_name"
-                                v-model="formEdit.class_name"
+                                id="name"
+                                v-model="formEdit.name"
                                 type="text"
                                 class="mt-1 block w-full"
-                                autocomplete="class_name"
+                                autocomplete="name"
                             />
-                            <InputError :message="formEdit.errors.class_name" class="mt-2" />
+                            <InputError :message="formEdit.errors.name" class="mt-2" />
                         </div>
                         <!-- Class Teacher -->
                         <div class="col-span-6 sm:col-span-4">

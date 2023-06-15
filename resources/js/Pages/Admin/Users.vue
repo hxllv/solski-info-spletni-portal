@@ -8,20 +8,20 @@ const props = defineProps({
     classes: Array,
     users: Object,
     params: Object,
-    middleware: Array,
+    permission: Array,
 });
 </script>
 
 <template>
     <AdminLayout title="Dashboard" v-slot="layout">
-        <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8" v-if="middleware.includes('users.invite')">
+        <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8" v-if="permission.includes('users.invite')">
             <div>
                 <AddUser :roles="roles" :classes="classes"/>   
             </div>
         </div>
-        <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8" v-if="middleware.includes('users.view')">
+        <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8" v-if="permission.includes('users.view')">
             <div>
-                <ShowUsers :users="users" :roles="roles" :classes="classes" :params="params" :buffer="layout.buffer" :middleware="middleware"/>
+                <ShowUsers :users="users" :roles="roles" :classes="classes" :params="params" :buffer="layout.buffer" :permission="permission"/>
             </div>
         </div>
     </AdminLayout>

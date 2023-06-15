@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Middleware;
+use App\Models\Permission;
 use App\Models\Role;
 use App\Models\SchoolClass;
 use App\Models\User;
@@ -27,14 +27,14 @@ class SchoolClassController extends Controller
 
         $data['term'] = $data['term'] ?? '';
 
-        $mQuery->where('class_name', 'LIKE', '%'.$data['term'].'%');
+        $mQuery->where('name', 'LIKE', '%'.$data['term'].'%');
 
-        $middlewares = auth()->user()->role->middlewares->pluck('name')->toArray();
+        $permissions = auth()->user()->role->permissions->pluck('name')->toArray();
 
         if (auth()->user()->is_account_owner) 
-            $middlewares = Middleware::all()->pluck('name')->toArray();
+            $permissions = Permission::all()->pluck('name')->toArray();
 
-        $potentialTeachers = Middleware::find('class.teacher')->roles()->with('users')->get()->pluck('users')->flatten();
+        $potentialTeachers = Permission::find('class.teacher')->roles()->with('users')->get()->pluck('users')->flatten();
 
         return Inertia::render('Admin/Classes', 
         [
@@ -43,7 +43,7 @@ class SchoolClassController extends Controller
             'params' => [
                 'term' => $data['term'],
             ],
-            'middleware' => $middlewares
+            'permission' => $permissions
         ]);
     }
 
@@ -91,10 +91,10 @@ class SchoolClassController extends Controller
         if ($data['role_adding'] !== '') 
             $nQuery->where('role_id', $data['role_adding']);
 
-        $middlewares = auth()->user()->role->middlewares->pluck('name')->toArray();
+        $permissions = auth()->user()->role->permissions->pluck('name')->toArray();
 
         if (auth()->user()->is_account_owner) 
-            $middlewares = Middleware::all()->pluck('name')->toArray();
+            $permissions = Permission::all()->pluck('name')->toArray();
 
         return Inertia::render('Admin/Class', 
         [
@@ -110,7 +110,7 @@ class SchoolClassController extends Controller
                 'role' => $data['role'],
                 'role_adding' => $data['role_adding'],
             ],
-            'middleware' => $middlewares
+            'permission' => $permissions
         ]);
     }
 
@@ -121,7 +121,7 @@ class SchoolClassController extends Controller
         $input = $request->all();
 
         Validator::make($input, [
-            'class_name' => ['required', 'string', 'max:255', Rule::unique('school_classes')],
+            'name' => ['required', 'string', 'max:255', Rule::unique('school_classes')],
             'class_teacher' => ['required', 'numeric'],
         ])->validate();
 
@@ -129,7 +129,7 @@ class SchoolClassController extends Controller
 
         DB::transaction(function () use ($input, $user) {
             return tap($user->classTeacherOf()->create([
-                'class_name' => $input['class_name'],
+                'name' => $input['name'],
             ]), function (SchoolClass $class) {
                 return $class;
             });
@@ -143,12 +143,12 @@ class SchoolClassController extends Controller
         $input = $request->all();
 
         Validator::make($input, [
-            'class_name' => ['required', 'string', 'max:255', Rule::unique('school_classes')->ignore($class->id)],
+            'name' => ['required', 'string', 'max:255', Rule::unique('school_classes')->ignore($class->id)],
             'class_teacher' => ['required', 'numeric'],
         ])->validate();
 
         $class->forceFill([
-            'class_name' => $input['class_name'],
+            'name' => $input['name'],
         ]);
 
         $class->classTeacher()->associate($input['class_teacher'])->save();
