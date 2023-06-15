@@ -171,23 +171,24 @@ const usersModAdding = computed(() => {
                             <option v-for="role in roles" :value="role.id">{{role.name}}</option>
                         </Select>
                     </div>
+
                     <div class="mt-5 md:mt-0 md:col-span-1 p-2 text-right flex items-end justify-end">
                         <Link preserve-scroll preserve-state :href="route('view.class', sClass.id)" :data="{ page: 1, term: '', role: '' }" class="mr-1" @click="formFilter.reset()">
                             <SecondaryButton>
-                                Reset
+                                Ponastavi
                             </SecondaryButton>
                         </Link>
 
                         <Link preserve-scroll preserve-state :href="route('view.class', sClass.id)" :data="{ page: 1, term: formFilter.term, role: formFilter.role }">
                             <PrimaryButton>
-                                Apply
+                                Uporabi
                             </PrimaryButton>
                         </Link>
                     </div>
                 </div>
 
                 <!-- multi actions -->
-                <div class="md:grid md:grid-cols-3 md:gap-6">
+                <div class="md:grid md:grid-cols-3 md:gap-6" v-if="permission.includes('classes.edit')">
                     <div class="mt-5 md:mt-0 md:col-span-1 p-2">
                         <SecondaryButton class="mr-1" :class="multiActionsClass" @click="dissociateUsers">
                             Odstrani iz razreda
@@ -200,7 +201,7 @@ const usersModAdding = computed(() => {
 
                 <Table :data="usersMod" :headerNames="['Ime', 'Email', 'Skupina pravic']" 
                     :sortedAs="['fullname', 'email', 'role']" 
-                    :allowEdit="false" :allowDelete="false" :allowMultiActions="true"
+                    :allowEdit="false" :allowDelete="false" :allowMultiActions="permission.includes('classes.edit')"
                     :query="{ term: formFilter.term, role: formFilter.role }"
                     :buffer="layout.buffer"
                     @selectedChange="onSelectChange"
@@ -208,7 +209,6 @@ const usersModAdding = computed(() => {
                     :routeParams="[sClass.id]"
                 />
 
-                <!-- todo: adding students to class -->
                 <DialogModal :show="addingUsers" @close="closeAddingModal" maxWidth="4xl"> 
                     <template #title>
                         Dodaj uporabnike
@@ -241,13 +241,13 @@ const usersModAdding = computed(() => {
                             <div class="mt-5 md:mt-0 md:col-span-1 p-2 text-right flex items-end justify-end">
                                 <Link preserve-scroll preserve-state :href="route('view.class', sClass.id)" :data="{ page: props.params.page, ps_page: 1, term_adding: '', role_adding: '' }" class="mr-1" @click="formFilterAdding.reset()">
                                     <SecondaryButton>
-                                        Reset
+                                        Ponastavi
                                     </SecondaryButton>
                                 </Link>
 
                                 <Link preserve-scroll preserve-state :href="route('view.class', sClass.id)" :data="{ page: props.params.page, ps_page: 1, term_adding: formFilterAdding.term_adding, role_adding: formFilterAdding.role_adding }">
                                     <PrimaryButton>
-                                        Apply
+                                        Uporabi
                                     </PrimaryButton>
                                 </Link>
                             </div>
@@ -266,7 +266,7 @@ const usersModAdding = computed(() => {
 
                     <template #footer>
                         <SecondaryButton @click="closeAddingModal">
-                            Cancel
+                            Prekliči
                         </SecondaryButton>
 
                         <PrimaryButton
@@ -274,7 +274,7 @@ const usersModAdding = computed(() => {
                             :class="multiActionsAddingClass"
                             @click="addUsers"
                         >
-                            Save
+                            Shrani
                         </PrimaryButton>
                     </template>
                 </DialogModal>

@@ -31,6 +31,8 @@ const inclds = (...names) => {
 }
 
 let form = ref({
+    'teacher': false,
+    'class.teacher': false,
     'admin.panel.view': false,
     'users.view': false,
     'users.invite': false,
@@ -40,6 +42,14 @@ let form = ref({
     'roles.create': false,
     'roles.edit': false,
     'roles.delete': false,
+    'classes.view': false,
+    'classes.create': false,
+    'classes.edit': false,
+    'classes.delete': false,
+    'subjects.view': false,
+    'subjects.create': false,
+    'subjects.edit': false,
+    'subjects.delete': false,
     ...inclds()
 });
 
@@ -58,10 +68,10 @@ const emitter = () => {
 
 const users = {
     arr: [
-        { name: 'View', id: 'users.view'},
-        { name: 'Invite', id: 'users.invite'},
-        { name: 'Edit', id: 'users.edit'},
-        { name: 'Delete', id: 'users.delete'}
+        { name: 'Pogled', id: 'users.view'},
+        { name: 'Povabljanje', id: 'users.invite'},
+        { name: 'Urejanje', id: 'users.edit'},
+        { name: 'Brisanje', id: 'users.delete'}
     ],
     form: {
         ...inclds('users.view', 'users.invite', 'users.edit', 'users.delete')
@@ -70,10 +80,10 @@ const users = {
 
 const roles = {
     arr: [
-        { name: 'View', id: 'roles.view'},
-        { name: 'Create', id: 'roles.create'},
-        { name: 'Edit', id: 'roles.edit'},
-        { name: 'Delete', id: 'roles.delete'}
+        { name: 'Pogled', id: 'roles.view'},
+        { name: 'Ustvarjanje', id: 'roles.create'},
+        { name: 'Urejanje', id: 'roles.edit'},
+        { name: 'Brisanje', id: 'roles.delete'}
     ],
     form: {
         ...inclds('roles.view', 'roles.create', 'roles.edit', 'roles.delete')
@@ -82,13 +92,25 @@ const roles = {
 
 const classes = {
     arr: [
-        { name: 'View', id: 'classes.view'},
-        { name: 'Create', id: 'classes.create'},
-        { name: 'Edit', id: 'classes.edit'},
-        { name: 'Delete', id: 'classes.delete'}
+        { name: 'Pogled', id: 'classes.view'},
+        { name: 'Ustvarjanje', id: 'classes.create'},
+        { name: 'Urejanje', id: 'classes.edit'},
+        { name: 'Brisanje', id: 'classes.delete'}
     ],
     form: {
         ...inclds('classes.view', 'classes.create', 'classes.edit', 'classes.delete')
+    }
+}
+
+const subjects = {
+    arr: [
+        { name: 'Pogled', id: 'subjects.view'},
+        { name: 'Ustvarjanje', id: 'subjects.create'},
+        { name: 'Urejanje', id: 'subjects.edit'},
+        { name: 'Brisanje', id: 'subjects.delete'}
+    ],
+    form: {
+        ...inclds('subjects.view', 'subjects.create', 'subjects.edit', 'subjects.delete')
     }
 }
 </script>
@@ -109,7 +131,7 @@ const classes = {
                     </InputLabel>
                 </div>
             </tr>
-            <div :class="[form['admin.panel.view'] ? '' : 'pointer-events-none opacity-30']" class="border p-2 rounded-md shadow mb-3">
+            <div :class="[form['admin.panel.view'] ? '' : 'pointer-events-none opacity-30']" class="border p-2 rounded-md shadow mb-3 ml-5">
                 <h1 class="font-semibold text-gray-900 text-lg m-2">Users</h1>
                 <table class="w-full">
                     <tr class="bg-white hover:bg-gray-50">
@@ -134,6 +156,14 @@ const classes = {
                         </div>
                     </tr>
                 </table>
+                <h1 class="font-semibold text-gray-900 text-lg m-2">Subjects</h1>
+                <table class="w-full">
+                    <tr class="bg-white hover:bg-gray-50">
+                        <div class="m-2 text-xl">
+                            <InlineCheckboxes :items="subjects.arr" :form="subjects.form" @formChange="updateForm"/>
+                        </div>
+                    </tr>
+                </table>
             </div>
             <tr class="bg-white hover:bg-gray-50">
                 <div class="m-2">
@@ -141,7 +171,19 @@ const classes = {
                         <div class="flex items-center">
                             <Checkbox class="p-2" id="class.teacher" v-model:checked="form['class.teacher']" name="class.teacher" required @change="emitter"/>
                             <div class="ml-2">
-                                Can be class teacher
+                                Je lahko razrednik
+                            </div>
+                        </div>
+                    </InputLabel>
+                </div>
+            </tr>
+            <tr class="bg-white hover:bg-gray-50">
+                <div class="m-2">
+                    <InputLabel for="teacher" textSize="text-base">
+                        <div class="flex items-center">
+                            <Checkbox class="p-2" id="teacher" v-model:checked="form['teacher']" name="teacher" required @change="emitter"/>
+                            <div class="ml-2">
+                                Je lahko nosilec predmeta
                             </div>
                         </div>
                     </InputLabel>

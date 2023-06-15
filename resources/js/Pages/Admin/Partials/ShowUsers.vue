@@ -190,13 +190,13 @@ const usersMod = computed(() => {
         <div class="mt-5 md:mt-0 md:col-span-1 p-2 text-right flex items-end justify-end">
             <Link preserve-scroll preserve-state :href="route('users')" :data="{ page: 1, term: '', role: '' }" class="mr-1" @click="formFilter.reset()">
                 <SecondaryButton>
-                    Reset
+                    Ponastavi
                 </SecondaryButton>
             </Link>
 
             <Link preserve-scroll preserve-state :href="route('users')" :data="{ page: 1, term: formFilter.term, role: formFilter.role }">
                 <PrimaryButton>
-                    Apply
+                    Uporabi
                 </PrimaryButton>
             </Link>
         </div>
@@ -242,25 +242,25 @@ const usersMod = computed(() => {
 
     <DialogModal :show="confirmingUserDeletion" @close="closeDeleteModal"> 
         <template #title>
-            Delete Account
+            Izbriši uporabnika?
         </template>
 
         <template #content>
-            Are you sure you want to delete this account? Once this account is deleted, all of its resources and data will be permanently deleted.
+            Vsi podatki vezani na tega uporabnika bodo izbrisani!
 
             <InputError :message="formDelete.errors.delete" class="mt-2" />
         </template>
 
         <template #footer>
             <SecondaryButton @click="closeDeleteModal">
-                Cancel
+                Prekliči
             </SecondaryButton>
 
             <DangerButton
                 class="ml-3"
                 @click="deleteUser"
             >
-                Delete Account
+                Izbriši uporabnika
             </DangerButton>
         </template>
     </DialogModal>
@@ -269,7 +269,7 @@ const usersMod = computed(() => {
 
     <DialogModal :show="userEditing" @close="closeEditModal"> 
         <template #title>
-            Edit Account
+            Uredi uporabnika
         </template>
 
         <template #content>
@@ -352,14 +352,14 @@ const usersMod = computed(() => {
 
         <template #footer>
             <SecondaryButton @click="closeEditModal">
-                Cancel
+                Prekliči
             </SecondaryButton>
 
             <PrimaryButton
                 class="ml-3"
                 @click="editUserData"
             >
-                Save
+                Shrani
             </PrimaryButton>
         </template>
     </DialogModal>
@@ -374,7 +374,7 @@ const usersMod = computed(() => {
             Dodeli razred
         </template>
         <template #title v-if="showMultiModal === 'delete'">
-            Izbriši uporabnike
+            Izbriši uporabnike?
         </template>
 
         <template #content v-if="showMultiModal === 'role'">
@@ -421,33 +421,33 @@ const usersMod = computed(() => {
             </form>
         </template>
         <template #content v-if="showMultiModal === 'delete'">
-            Are you sure you want to delete this account? Once this account is deleted, all of its resources and data will be permanently deleted.
+            Vsi podatki vezani na te uporabnike bodo izbrisani!
 
             <InputError :message="formMulti.errors.delete" class="mt-2" />
         </template>
 
         <template #footer v-if="showMultiModal === 'role' || showMultiModal === 'class'">
             <SecondaryButton @click="closeMultiModal">
-                Cancel
+                Prekliči
             </SecondaryButton>
 
             <PrimaryButton
                 class="ml-3"
                 @click="multiActionDo(showMultiModal)"
             >
-                Save
+                Shrani
             </PrimaryButton>
         </template>
         <template #footer v-if="showMultiModal === 'delete'">
             <SecondaryButton @click="closeMultiModal">
-                Cancel
+                Prekliči
             </SecondaryButton>
 
             <DangerButton
                 class="ml-3"
                 @click="multiActionDo(showMultiModal)"
             >
-                Delete Account
+                Izbriši uporabnike
             </DangerButton>
         </template>
     </DialogModal>

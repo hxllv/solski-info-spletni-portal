@@ -107,13 +107,13 @@ const classesMod = computed(() => {
         <div class="mt-5 md:mt-0 md:col-span-2 p-2 text-right flex items-end justify-end">
             <Link preserve-scroll preserve-state :href="route('classes')" :data="{ page: 1, term: '' }" class="mr-1" @click="formFilter.reset()">
                 <SecondaryButton>
-                    Reset
+                    Ponastavi
                 </SecondaryButton>
             </Link>
 
             <Link preserve-scroll preserve-state :href="route('classes')" :data="{ page: 1, term: formFilter.term }">
                 <PrimaryButton>
-                    Apply
+                    Uporabi
                 </PrimaryButton>
             </Link>
         </div>
@@ -134,23 +134,23 @@ const classesMod = computed(() => {
 
     <DialogModal :show="confirmingDeletion" @close="closeDeleteModal"> 
         <template #title>
-            Delete data
+            Izbris razreda?
         </template>
 
         <template #content>
-            Are you sure you want to delete this data? Once this datais deleted, all of its resources and data will be permanently deleted.
+            Vsi podatki vezani na ta razred bodo izbrisani!
         </template>
 
         <template #footer>
             <SecondaryButton @click="closeDeleteModal">
-                Cancel
+                Prekliči
             </SecondaryButton>
 
             <DangerButton
                 class="ml-3"
                 @click="deleteItem"
             >
-                Delete data
+                Izbriši razred
             </DangerButton>
         </template>
     </DialogModal>
@@ -159,7 +159,7 @@ const classesMod = computed(() => {
 
     <DialogModal :show="editing" @close="closeEditModal"> 
         <template #title>
-            Edit data
+            Uredi razred
         </template>
 
         <template #content>
@@ -202,14 +202,14 @@ const classesMod = computed(() => {
 
         <template #footer>
             <SecondaryButton @click="closeEditModal">
-                Cancel
+                Prekliči
             </SecondaryButton>
 
             <PrimaryButton
                 class="ml-3"
                 @click="editItemData"
             >
-                Save
+                Shrani
             </PrimaryButton>
         </template>
     </DialogModal>

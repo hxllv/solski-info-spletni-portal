@@ -7,19 +7,14 @@ import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
 import ActionMessage from '@/Components/ActionMessage.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
-import Select from '@/Components/Select.vue';
-
-const props = defineProps({
-    users: Array,
-});
 
 const form = useForm({
     name: '',
-    class_teacher: ''
 });
 
-const postNewClassData = () => {
-    form.post(route('create.class'), {
+const postNewData = () => {
+    form.post(route('create.subject'), {
+        preserveState: true,
         onSuccess: () => {
             form.reset()
         },
@@ -29,19 +24,19 @@ const postNewClassData = () => {
 </script>
 
 <template>
-    <FormSection @submitted="postNewClassData">
+    <FormSection @submitted="postNewData">
         <template #title>
-            Dodaj razred
+            Dodaj predmet
         </template>
 
         <template #description>
-            nevem se ka tle napisat
+            yes
         </template>
 
         <template #form>
             <!-- Name -->
             <div class="col-span-6 sm:col-span-4">
-                <InputLabel for="name" value="Naziv razreda" />
+                <InputLabel for="name" value="Naziv predmeta" />
                 <TextInput
                     id="name"
                     v-model="form.name"
@@ -50,22 +45,6 @@ const postNewClassData = () => {
                     autocomplete="name"
                 />
                 <InputError :message="form.errors.name" class="mt-2" />
-            </div>
-
-            <!-- Class Teacher -->
-            <div class="col-span-6 sm:col-span-4">
-                <InputLabel for="class" value="Razrednik" />
-                <Select
-                    id="class_teacher"
-                    v-model="form.class_teacher"
-                    class="mt-1 block w-full"
-                    autocomplete="class_teacher"
-                >
-                    <option v-for="user in users" :value="user.id">
-                        {{ `${user.name} ${user.surname} - ${user.email}` }}
-                    </option>
-                </Select>
-                <InputError :message="form.errors.class_teacher" class="mt-2" />
             </div>
         </template>
 

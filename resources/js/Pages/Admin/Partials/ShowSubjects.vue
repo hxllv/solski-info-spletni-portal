@@ -9,21 +9,19 @@ import Table from '@/Components/Table.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
-import SelectPermissions from '@/Pages/Admin/Partials/SelectPermissions.vue';
+import Select from '@/Components/Select.vue';
 
 const props = defineProps({
-    roles: Object,
+    subjects: Object,
     params: Object,
     buffer: Boolean,
     permission: Array
 });
 
-const permissionsForItem = ref(false);
 const confirmingDeletion = ref(false);
 const editing = ref(false);
 const itemToDelete = ref(false);
 const itemToEdit = ref(false);
-const formPermissions = ref(false);
 const formDelete = useForm({});
 const formEdit = useForm({
     name: '',
@@ -47,7 +45,7 @@ const openDeleteModal = (id) => {
 };
 
 const deleteItem = () => {
-    formDelete.delete(route('role.delete', itemToDelete.value), {
+    formDelete.delete(route('subject.delete', itemToDelete.value), {
         preserveScroll: true,
         onSuccess: () => closeDeleteModal(),
         onError: () => {},
@@ -67,25 +65,17 @@ const openEditModal = (id) => {
     editing.value = true;
     itemToEdit.value = id;
 
-    const roleTemp = props.roles.data.filter(role => { return role.id === id })[0]
-    permissionsForItem.value = roleTemp.permissions.map(mw => mw.name)
+    const dataTemp = props.subjects.data.filter(subject => { return subject.id === id })[0]
 
-    formEdit.name = roleTemp.name
+    formEdit.name = dataTemp.name
 };
 
 const editItemData = () => {
-    formEdit.transform(data => ({
-        ...data,
-        permissions: formPermissions.value
-    })).put(route('role.update', itemToEdit.value), {
+    formEdit.put(route('subject.update', itemToEdit.value), {
         preserveScroll: true,
         onSuccess: () => closeEditModal(),
         onError: () => {},
     });
-}
-
-const formChange = (data) => {
-    formPermissions.value = data
 }
 </script>
 
@@ -102,13 +92,13 @@ const formChange = (data) => {
             />
         </div>
         <div class="mt-5 md:mt-0 md:col-span-2 p-2 text-right flex items-end justify-end">
-            <Link preserve-scroll preserve-state :href="route('roles')" :data="{ page: 1, term: '' }" class="mr-1" @click="formFilter.reset()">
+            <Link preserve-scroll preserve-state :href="route('subjects')" :data="{ page: 1, term: '' }" class="mr-1" @click="formFilter.reset()">
                 <SecondaryButton>
                     Ponastavi
                 </SecondaryButton>
             </Link>
 
-            <Link preserve-scroll preserve-state :href="route('roles')" :data="{ page: 1, term: formFilter.term }">
+            <Link preserve-scroll preserve-state :href="route('subjects')" :data="{ page: 1, term: formFilter.term }">
                 <PrimaryButton>
                     Uporabi
                 </PrimaryButton>
@@ -116,25 +106,26 @@ const formChange = (data) => {
         </div>
     </div>
     
-    <Table :data="roles" :headerNames="['Ime']" 
+    <Table :data="subjects" :headerNames="['Naziv']" 
         :sortedAs="['name']" 
-        :allowEdit="permission.includes('roles.edit')" :allowDelete="permission.includes('roles.delete')" 
+        :allowEdit="permission.includes('subjects.edit')" :allowDelete="permission.includes('subjects.delete')" 
         @edit="openEditModal" 
         @delete="openDeleteModal"
+        detailsURL="view.subject"
         :query="{ term: formFilter.term }"
         :buffer="buffer"
-        routeName="roles"
+        routeName="subjects"
     />
 
     <!-- deleting -->
 
     <DialogModal :show="confirmingDeletion" @close="closeDeleteModal"> 
         <template #title>
-            Izbris skupine?
+            Izbris predmeta?
         </template>
 
         <template #content>
-            Vsi podatki vezani na to skupino bodo izbrisani!
+            Vsi podatki vezani na ta predmet bodo izbrisani!
 
             <InputError :message="formDelete.errors.delete" class="mt-2" />
         </template>
@@ -148,7 +139,7 @@ const formChange = (data) => {
                 class="ml-3"
                 @click="deleteItem"
             >
-                Izbriši skupino
+                Izbriši predmet
             </DangerButton>
         </template>
     </DialogModal>
@@ -157,7 +148,7 @@ const formChange = (data) => {
 
     <DialogModal :show="editing" @close="closeEditModal"> 
         <template #title>
-            Uredi skupino
+            Uredi predmet
         </template>
 
         <template #content>
@@ -178,8 +169,6 @@ const formChange = (data) => {
                             />
                             <InputError :message="formEdit.errors.name" class="mt-2" />
                         </div>
-
-                        <SelectPermissions :data="permissionsForItem" @formChange="formChange"/>
                     </div>
                 </div>
             </form>

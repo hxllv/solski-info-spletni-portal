@@ -25,6 +25,14 @@ class RoleController extends Controller
             'roles.create',
             'roles.edit',
             'roles.delete',
+            'classes.view',
+            'classes.invite',
+            'classes.edit',
+            'classes.delete',
+            'subjects.view',
+            'subjects.create',
+            'subjects.edit',
+            'subjects.delete',
         ];
     }
 

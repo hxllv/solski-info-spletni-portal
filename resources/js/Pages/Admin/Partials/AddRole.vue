@@ -50,11 +50,11 @@ const postNewData = () => {
 
         <template #actions>
             <ActionMessage :on="form.recentlySuccessful" class="mr-3">
-                Saved.
+                Shranjeno.
             </ActionMessage>
 
             <PrimaryButton :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-                Save
+                Shrani
             </PrimaryButton>
         </template>
     </FormSection>

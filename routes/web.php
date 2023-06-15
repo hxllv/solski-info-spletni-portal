@@ -4,6 +4,7 @@ use App\Http\Controllers\InviteController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SchoolClassController;
+use App\Http\Controllers\SubjectController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -82,6 +83,15 @@ Route::middleware([
         Route::post('/classes', [SchoolClassController::class, 'store'])->name('create.class');
         Route::delete('/classes/{class}', [SchoolClassController::class, 'destroy'])->name('class.delete');
         Route::put('/classes/{class}', [SchoolClassController::class, 'update'])->name('class.update');
+
+        // predmeti
+
+        Route::get('/subjects', [SubjectController::class, 'index'])->name('subjects');
+        Route::get('/subjects/{subject}', [SubjectController::class, 'view'])->name('view.subject');
+        Route::post('/subjects', [SubjectController::class, 'store'])->name('create.subject');
+        Route::delete('/subjects/{subject}', [SubjectController::class, 'destroy'])->name('subject.delete');
+        Route::put('/subjects/{subject}', [SubjectController::class, 'update'])->name('subject.update');
+        Route::post('/subjects/{subject}', [SubjectController::class, 'toggle'])->name('subject.toggle');
     })->name('admin');
 });
 

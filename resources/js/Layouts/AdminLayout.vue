@@ -46,6 +46,11 @@ router.on('finish', () => {
                     Razredi
                 </Tab>
             </li>
+            <li class="mr-2">
+                <Tab :href="route('subjects')" :active="route().current('subjects')">
+                    Predmeti
+                </Tab>
+            </li>
         </ul>
 
         <div class="m-2 max-w-7xl mt-0 sm:px-6 lg:px-8 mx-auto flex flex-wrap ">

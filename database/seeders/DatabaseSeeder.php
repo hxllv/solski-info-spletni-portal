@@ -26,13 +26,14 @@ class DatabaseSeeder extends Seeder
             'name' => 'Učenec',
         ]);
 
-        \App\Models\Middleware::factory()->hasAttached([$admin, $teacher])->createMany([
+        \App\Models\Permission::factory()->hasAttached([$admin, $teacher])->createMany([
             ['name' => 'class.teacher'],
+            ['name' => 'teacher'],
             ['name' => 'admin.panel.view'],
             ['name' => 'users.view'],
             ['name' => 'users.invite']
         ]);
-        \App\Models\Middleware::factory()->hasAttached($admin)->createMany([
+        \App\Models\Permission::factory()->hasAttached($admin)->createMany([
             ['name' => 'users.edit'],
             ['name' => 'users.delete'],
             ['name' => 'roles.view'],
@@ -42,7 +43,11 @@ class DatabaseSeeder extends Seeder
             ['name' => 'classes.view'],
             ['name' => 'classes.create'],
             ['name' => 'classes.edit'],
-            ['name' => 'classes.delete']
+            ['name' => 'classes.delete'],
+            ['name' => 'subjects.view'],
+            ['name' => 'subjects.create'],
+            ['name' => 'subjects.edit'],
+            ['name' => 'subjects.delete']
         ]);
 
         $adminUser = \App\Models\User::factory()->for($admin)->create([
@@ -52,7 +57,11 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $class = \App\Models\SchoolClass::factory()->for($adminUser, 'classTeacher')->create([
-            'class_name' => 'R1a',
+            'name' => 'R1a',
+        ]);
+
+        $subject = \App\Models\Subject::factory()->hasAttached($adminUser, [], 'teachedBy')->create([
+            'name' => 'Matematika',
         ]);
 
         \App\Models\User::factory()->for($teacher)->create([
