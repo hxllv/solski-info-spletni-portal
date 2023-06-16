@@ -138,7 +138,7 @@ class SubjectController extends Controller
     {
         $this->authorize('delete', Subject::class);
 
-        if ($subject->users->count() !== 0)
+        if ($subject->teachedBy->count() !== 0)
             return redirect()->back()->withErrors([
                 'delete' => 'Predmet ima nosilce.'
             ]);
@@ -156,6 +156,13 @@ class SubjectController extends Controller
             'custom_name' => ['string', 'nullable', 'max:255', Rule::unique('subjects', 'name')->ignore($subject->id)],
             'teacher' => ['required', 'numeric'],
         ])->validate();
+
+        $permArr = User::find($input['teacher'])->role()->with('permissions')->get()->pluck('permissions')->flatten()->pluck('name')->toArray();
+
+        if (!in_array('teacher', $permArr))
+            return redirect()->back()->withErrors([
+                'teacher' => 'Uporabnik ne more biti učitelj.'
+            ]);
 
         if ($subject->teachedBy()->find($input['teacher'])) {
             $subject->teachedBy()->detach($input['teacher']);

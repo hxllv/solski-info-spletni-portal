@@ -127,6 +127,13 @@ class SchoolClassController extends Controller
 
         $user = User::find($input['class_teacher']);
 
+        $permArr = $user->role()->with('permissions')->get()->pluck('permissions')->flatten()->pluck('name')->toArray();
+
+        if (!in_array('class.teacher', $permArr))
+            return redirect()->back()->withErrors([
+                'teacher' => 'Uporabnik ne more biti razrednik.'
+            ]);
+
         DB::transaction(function () use ($input, $user) {
             return tap($user->classTeacherOf()->create([
                 'name' => $input['name'],
@@ -146,6 +153,15 @@ class SchoolClassController extends Controller
             'name' => ['required', 'string', 'max:255', Rule::unique('school_classes')->ignore($class->id)],
             'class_teacher' => ['required', 'numeric'],
         ])->validate();
+
+        $user = User::find($input['class_teacher']);
+
+        $permArr = $user->role()->with('permissions')->get()->pluck('permissions')->flatten()->pluck('name')->toArray();
+
+        if (!in_array('class.teacher', $permArr))
+            return redirect()->back()->withErrors([
+                'teacher' => 'Uporabnik ne more biti razrednik.'
+            ]);
 
         $class->forceFill([
             'name' => $input['name'],
