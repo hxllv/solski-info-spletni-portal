@@ -13,7 +13,7 @@ const props = defineProps({
 </script>
 
 <template>
-    <AdminLayout title="Dashboard" v-slot="layout" :permission="permission">
+    <AdminLayout title="Uporabniki" v-slot="layout" :permission="permission">
         <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8" v-if="permission.includes('users.invite')">
             <div>
                 <AddUser :roles="roles" :classes="classes"/>   

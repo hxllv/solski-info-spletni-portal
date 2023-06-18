@@ -66,13 +66,13 @@ class InviteController extends Controller
         $class = $request->input('class');
 
         if (User::where('email', $email)->get()->count() !== 0)
-            abort(403, 'Email is already registered.');
+            abort(403, 'Email je že registriran.');
 
         if (Role::where('id', $role)->get()->count() === 0)
-            abort(403, 'Invalid role group.');
+            abort(403, 'Neveljavna skupina pravic.');
 
         if (!empty($class) && SchoolClass::where('id', $class)->get()->count() === 0)
-            abort(403, 'Invalid class.');
+            abort(403, 'Neveljavni razred.');
 
         event(new Registered($creator->invite($request->all())));
 

@@ -101,7 +101,7 @@ console.log(props.potentialTeachers)
 </script>
 
 <template>
-    <AdminLayout title="Dashboard" :backButtonURL="route('subjects')" :header="`Nosilci predmeta ${subject.name}`" v-slot="layout" :permission="permission">
+    <AdminLayout :title="`Nosilci predmeta ${subject.name}`" :backButtonURL="route('subjects')" v-slot="layout" :permission="permission">
         <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
             <div>
                 <div class="md:grid md:grid-cols-3 md:gap-6">

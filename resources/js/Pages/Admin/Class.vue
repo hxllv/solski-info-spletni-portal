@@ -158,7 +158,7 @@ const usersModAdding = computed(() => {
 </script>
 
 <template>
-    <AdminLayout title="Dashboard" :backButtonURL="route('classes')" :header="`Učenci razreda ${sClass.name}`" v-slot="layout" :permission="permission">
+    <AdminLayout :title="`Podrobnosti razreda ${sClass.name}`" :backButtonURL="route('classes')" v-slot="layout" :permission="permission">
         <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
             <div>
                 <h2 class="pb-6 px-2 text-xl text-gray-800 leading-tight">

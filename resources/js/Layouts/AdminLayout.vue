@@ -7,7 +7,6 @@ import { ref  } from 'vue';
 defineProps({
     title: String,
     backButtonURL: String,
-    header: String,
     permission: Array,
 });
 
@@ -27,7 +26,7 @@ router.on('finish', () => {
     <AppLayout :title="title" :permission="permission">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ header ? header : 'Admin' }}
+                {{ title }}
             </h2>
         </template>
 
