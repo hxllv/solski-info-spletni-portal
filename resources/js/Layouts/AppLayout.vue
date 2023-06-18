@@ -8,23 +8,30 @@ import DropdownLink from '@/Components/DropdownLink.vue';
 import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
 
-defineProps({
+const props = defineProps({
     title: String,
+    permission: Array,
 });
 
 const showingNavigationDropdown = ref(false);
 
-const switchToTeam = (team) => {
-    router.put(route('current-team.update'), {
-        team_id: team.id,
-    }, {
-        preserveState: false,
-    });
-};
-
 const logout = () => {
     router.post(route('logout'));
 };
+
+const getAdminRoute = () => {
+    if (props.permission.includes('users.view'))
+        return route('users')
+    if (props.permission.includes('roles.view'))
+        return route('roles')
+    if (props.permission.includes('classes.view'))
+        return route('classes')
+    if (props.permission.includes('subjects.view'))
+        return route('subjects')
+    return route('dashboard')
+}
+
+const adminRoute = ref(getAdminRoute());
 </script>
 
 <template>
@@ -53,11 +60,12 @@ const logout = () => {
                                 </NavLink>
                             </div>
 
-                            <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                                <NavLink :href="route('users')" :active="
+                            <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex" v-if="permission.includes('admin.panel.view')">
+                                <NavLink :href="adminRoute" :active="
                                     route().current('users') ||
                                     route().current('roles') ||
-                                    route().current('classes')
+                                    route().current('classes') ||
+                                    route().current('subject')
                                 ">
                                     Admin
                                 </NavLink>

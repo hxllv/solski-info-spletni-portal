@@ -43,17 +43,17 @@ class InviteController extends Controller
 
         if (User::where('email', $data['email'])->get()->count() !== 0)
             return redirect()->back()->withErrors([
-                'email' => 'Email is already registered.'
+                'email' => 'Email je že registriran.'
             ]);
 
         if (Role::where('id', $data['role'])->get()->count() === 0)
             return redirect()->back()->withErrors([
-                'role' => 'Invalid role group.'
+                'role' => 'Neveljavna skupina pravic.'
             ]);
 
         if (!empty($data['class']) && $$data['class'] != -1 && SchoolClass::where('id', $data['class'])->get()->count() === 0)
             return redirect()->back()->withErrors([
-                'class' => 'Invalid class.'
+                'class' => 'Neveljavni razred.'
             ]);
 
         Notification::route('mail', $data['email'])->notify(new Invite($data));

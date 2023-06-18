@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\SchoolClass;
+use App\Models\SubjectTeacher;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -96,6 +97,9 @@ class SchoolClassController extends Controller
         if (auth()->user()->is_account_owner) 
             $permissions = Permission::all()->pluck('name')->toArray();
 
+        $teacherSubject = SubjectTeacher::with(['user', 'subject'])->get();
+        $timetableEntries = $class->timetable_entries()->with('subject_teacher')->get();
+
         return Inertia::render('Admin/Class', 
         [
             'sClass' => $class,
@@ -103,6 +107,8 @@ class SchoolClassController extends Controller
             'students' => $mQuery->with('role')->paginate(10),
             'potentialStudents' => $nQuery->with(['role', 'studentOf'])->paginate(10, ['*'], 'ps_page'),
             'roles' => Role::all(),
+            'subjects' => $teacherSubject,
+            'timetableEntries' => $timetableEntries,
             'params' => [
                 'page' => request()->input('page'),
                 'term' => $data['term'],

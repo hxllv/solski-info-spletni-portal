@@ -5,6 +5,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SchoolClassController;
 use App\Http\Controllers\SubjectController;
+use App\Http\Controllers\TimetableEntryController;
+use App\Models\Permission;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -55,7 +57,12 @@ Route::middleware([
     'verified',
 ])->group(function () {
     Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
+        $permissions = auth()->user()->role->permissions->pluck('name')->toArray();
+
+        if (auth()->user()->is_account_owner) 
+            $permissions = Permission::all()->pluck('name')->toArray();
+
+        return Inertia::render('Dashboard', ['permission' => $permissions]);
     })->name('dashboard');
 
     Route::prefix('admin')->group(function () {
@@ -92,6 +99,11 @@ Route::middleware([
         Route::delete('/subjects/{subject}', [SubjectController::class, 'destroy'])->name('subject.delete');
         Route::put('/subjects/{subject}', [SubjectController::class, 'update'])->name('subject.update');
         Route::post('/subjects/{subject}', [SubjectController::class, 'toggle'])->name('subject.toggle');
+
+        // timetable
+
+        Route::post('/timetable', [TimetableEntryController::class, 'store'])->name('create.timetable');
+        Route::post('/timetable/{entry}', [TimetableEntryController::class, 'destroy'])->name('timetable.delete');
     })->name('admin');
 });
 

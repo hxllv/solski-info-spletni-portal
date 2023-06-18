@@ -9,12 +9,15 @@ import SecondaryButton from '@/Components/SecondaryButton.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import DialogModal from '@/Components/DialogModal.vue';
 import Select from '@/Components/Select.vue';
+import Timetable from '@/Components/Timetable.vue';
 
 const props = defineProps({
     sClass: Object,
     classTeacher: Object,
     potentialStudents: Object,
     roles: Array,
+    subjects: Array,
+    timetableEntries: Array,
     students: Object,
     params: Object,
     permission: Array,
@@ -103,6 +106,21 @@ const dissociateUsers = () => {
     });
 };
 
+const refresh = () => {
+    router.get(
+        route('view.class', props.sClass.id), 
+        {
+            page: props.params.page, 
+            term: props.params.term,
+            role: props.params.role,
+        },
+        {
+            preserveState: true,
+            preserveScroll: true,
+        }
+    )
+}
+
 // modifying users
 
 const hatedProps = ['created_at', 'current_team_id', 'email_verified_at', 'role_id', 'name', 'surname', 'two_factor_confirmed_at', 'updated_at'];
@@ -140,7 +158,7 @@ const usersModAdding = computed(() => {
 </script>
 
 <template>
-    <AdminLayout title="Dashboard" :backButtonURL="route('classes')" :header="`Učenci razreda ${sClass.name}`" v-slot="layout">
+    <AdminLayout title="Dashboard" :backButtonURL="route('classes')" :header="`Učenci razreda ${sClass.name}`" v-slot="layout" :permission="permission">
         <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
             <div>
                 <h2 class="pb-6 px-2 text-xl text-gray-800 leading-tight">
@@ -208,6 +226,10 @@ const usersModAdding = computed(() => {
                     routeName="view.class"
                     :routeParams="[sClass.id]"
                 />
+
+                <div class="p-4"></div>
+
+                <Timetable :subjects="subjects" :classId="sClass.id" :data="timetableEntries" :allowEdit="permission.includes('timetable.edit')" :buffer="layout.buffer" @refresh="refresh" />
 
                 <DialogModal :show="addingUsers" @close="closeAddingModal" maxWidth="4xl"> 
                     <template #title>

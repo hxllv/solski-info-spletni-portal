@@ -113,6 +113,15 @@ const subjects = {
         ...inclds('subjects.view', 'subjects.create', 'subjects.edit', 'subjects.delete')
     }
 }
+
+const timetable = {
+    arr: [
+        { name: 'Urejanje', id: 'timetable.edit'},
+    ],
+    form: {
+        ...inclds('timetable.edit')
+    }
+}
 </script>
 
 <template>
@@ -132,7 +141,7 @@ const subjects = {
                 </div>
             </tr>
             <div :class="[form['admin.panel.view'] ? '' : 'pointer-events-none opacity-30']" class="border p-2 rounded-md shadow mb-3 ml-5">
-                <h1 class="font-semibold text-gray-900 text-lg m-2">Users</h1>
+                <h1 class="font-semibold text-gray-900 text-lg m-2">Uporabniki</h1>
                 <table class="w-full">
                     <tr class="bg-white hover:bg-gray-50">
                         <div class="m-2 text-xl">
@@ -140,7 +149,7 @@ const subjects = {
                         </div>
                     </tr>
                 </table>
-                <h1 class="font-semibold text-gray-900 text-lg m-2">Roles</h1>
+                <h1 class="font-semibold text-gray-900 text-lg m-2">Skupine pravic</h1>
                 <table class="w-full">
                     <tr class="bg-white hover:bg-gray-50">
                         <div class="m-2 text-xl">
@@ -148,7 +157,7 @@ const subjects = {
                         </div>
                     </tr>
                 </table>
-                <h1 class="font-semibold text-gray-900 text-lg m-2">Classes</h1>
+                <h1 class="font-semibold text-gray-900 text-lg m-2">Razredi</h1>
                 <table class="w-full">
                     <tr class="bg-white hover:bg-gray-50">
                         <div class="m-2 text-xl">
@@ -156,11 +165,19 @@ const subjects = {
                         </div>
                     </tr>
                 </table>
-                <h1 class="font-semibold text-gray-900 text-lg m-2">Subjects</h1>
+                <h1 class="font-semibold text-gray-900 text-lg m-2">Predmeti</h1>
                 <table class="w-full">
                     <tr class="bg-white hover:bg-gray-50">
                         <div class="m-2 text-xl">
                             <InlineCheckboxes :items="subjects.arr" :form="subjects.form" @formChange="updateForm"/>
+                        </div>
+                    </tr>
+                </table>
+                <h1 class="font-semibold text-gray-900 text-lg m-2">Urnik</h1>
+                <table class="w-full">
+                    <tr class="bg-white hover:bg-gray-50">
+                        <div class="m-2 text-xl">
+                            <InlineCheckboxes :items="timetable.arr" :form="timetable.form" @formChange="updateForm"/>
                         </div>
                     </tr>
                 </table>

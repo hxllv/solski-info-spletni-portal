@@ -24,6 +24,7 @@ const props = defineProps({
 
 const confirmingUserDeletion = ref(false);
 const userEditing = ref(false);
+const editingAccountOwner = ref(false);
 const userToDelete = ref(false);
 const userToEdit = ref(false);
 const selectedUsers = ref(false);
@@ -85,6 +86,7 @@ const openEditModal = (id) => {
 
     const userTemp = props.users.data.filter(user => { return user.id === id })[0]
 
+    editingAccountOwner.value = userTemp.is_account_owner
     formEdit.name = userTemp.name
     formEdit.surname = userTemp.surname
     formEdit.email = userTemp.email
@@ -149,7 +151,7 @@ const usersMod = computed(() => {
 
     newUsers.data.forEach(user => {
         user.fullname = `${user.name} ${user.surname}`
-        user.role = user.role.name
+        user.role = user.is_account_owner ? 'Glavni administrator' : user.role.name
         user.class = user.student_of ? user.student_of.name : '/'
 
         hatedProps.forEach(prop => {
@@ -318,7 +320,7 @@ const usersMod = computed(() => {
                         </div>
 
                         <!-- Role -->
-                        <div class="col-span-6 sm:col-span-4">
+                        <div class="col-span-6 sm:col-span-4" v-if="!editingAccountOwner">
                             <InputLabel for="role" value="Skupina pravic" />
                             <Select
                                 id="role"

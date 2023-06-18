@@ -65,7 +65,7 @@ class UserController extends Controller
 
         if (Role::where('id', $request->input('role'))->get()->count() === 0)
             return redirect()->back()->withErrors([
-                'role' => 'Invalid role group.'
+                'role' => 'Neveljavna skupina pravic.'
             ]);
 
         $updater->update($user, $request->all());
@@ -88,7 +88,7 @@ class UserController extends Controller
         if (!empty($data['class'])) {
             if ($data['class'] != -1 && Role::find($data['class'])->get()->count() === 0)
                 return redirect()->back()->withErrors([
-                    'class' => 'Invalid class.'
+                    'class' => 'Neveljavni razred.'
                 ]);
 
             foreach ($users as $user) {
@@ -102,7 +102,7 @@ class UserController extends Controller
         else if (!empty($data['role'])) {
             if (Role::find($data['role'])->get()->count() === 0)
                 return redirect()->back()->withErrors([
-                    'role' => 'Invalid role group.'
+                    'role' => 'Neveljavna skupina pravic.'
                 ]);
 
             foreach ($users as $user) {
@@ -132,12 +132,12 @@ class UserController extends Controller
 
         if (auth()->user()->id === $user->id)
             return redirect()->back()->withErrors([
-                'delete' => 'Can\'t delete yourself.'
+                'delete' => 'Prijavljeni uporabnik se ne more izbrisati.'
             ]);
 
         if ($user->is_account_owner)
             return redirect()->back()->withErrors([
-                'delete' => 'Can\'t delete account owner.'
+                'delete' => 'Glavnega administratorja se ne more izbrisati.'
             ]);
 
         app(DeleteUser::class)->delete($user);

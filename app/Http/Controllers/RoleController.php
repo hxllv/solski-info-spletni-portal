@@ -33,6 +33,7 @@ class RoleController extends Controller
             'subjects.create',
             'subjects.edit',
             'subjects.delete',
+            'timetable.edit',
         ];
     }
 
@@ -104,7 +105,7 @@ class RoleController extends Controller
         if (!$permissions)
             return;
 
-        $role->permissions()->attach(array_keys($permissions, true));
+        $role->permissions()->syncWithoutDetaching(array_keys($permissions, true));
         $role->permissions()->detach(array_keys($permissions, false));
 
         if (!$permissions['admin.panel.view']) {
@@ -121,7 +122,7 @@ class RoleController extends Controller
 
         if ($role->users->count() !== 0)
             return redirect()->back()->withErrors([
-                'delete' => 'Role has users assigned to it.'
+                'delete' => 'Skupina pravic ima uporabnike, ki jo uporabljajo.'
             ]);
 
         $role->delete();

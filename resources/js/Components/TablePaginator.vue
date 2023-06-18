@@ -57,14 +57,17 @@ const isAtData = (str) => {
     <div class="flex items-center justify-between border-gray-200 bg-white px-4 py-3 sm:px-6 col-span-3 sm:rounded-b-md">
         <div class="flex flex-1 items-center justify-between">
             <div class="hidden sm:block">
-                <p class="text-sm text-gray-700">
-                    Showing
-                    <span class="font-medium">{{ data.from }}</span>
-                    to
-                    <span class="font-medium">{{ data.to }}</span>
-                    of
+                <p class="text-sm text-gray-700" v-if="data.total === 0">
+                    Ni rezultatov
+                </p>
+                <p class="text-sm text-gray-700" v-else>
+                    Prikazano
+                    <span class="font-medium">{{ data.from }}.</span>
+                    do
+                    <span class="font-medium">{{ data.to }}.</span>
+                    od
                     <span class="font-medium">{{ data.total }}</span>
-                    results
+                    rezultatov
                 </p>
             </div>
             <div>

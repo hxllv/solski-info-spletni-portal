@@ -8,6 +8,7 @@ defineProps({
     title: String,
     backButtonURL: String,
     header: String,
+    permission: Array,
 });
 
 const buffer = ref(false)
@@ -23,7 +24,7 @@ router.on('finish', () => {
 </script>
 
 <template>
-    <AppLayout :title="title">
+    <AppLayout :title="title" :permission="permission">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 {{ header ? header : 'Admin' }}
@@ -31,22 +32,22 @@ router.on('finish', () => {
         </template>
 
         <ul class="m-2 max-w-7xl mt-0 px-2 sm:px-6 lg:px-8 mx-auto flex flex-wrap text-sm font-medium text-center text-gray-500" v-if="!backButtonURL">
-            <li class="mr-2">
+            <li class="mr-2" v-if="permission.includes('users.view')">
                 <Tab :href="route('users', 1)" :active="route().current('users')">
                     Uporabniki
                 </Tab>
             </li>
-            <li class="mr-2">
+            <li class="mr-2" v-if="permission.includes('roles.view')">
                 <Tab :href="route('roles')" :active="route().current('roles')">
                     Uporabniške pravice
                 </Tab>
             </li>
-            <li class="mr-2">
+            <li class="mr-2" v-if="permission.includes('classes.view')">
                 <Tab :href="route('classes')" :active="route().current('classes')">
                     Razredi
                 </Tab>
             </li>
-            <li class="mr-2">
+            <li class="mr-2" v-if="permission.includes('subjects.view')">
                 <Tab :href="route('subjects')" :active="route().current('subjects')">
                     Predmeti
                 </Tab>

@@ -76,7 +76,7 @@ const selectedChange = () => {
         <Spinner :buffer="buffer" />
 
         <div class="overflow-x-auto grid grid-cols-3 sm:rounded-t-md">
-            <table class="table-auto mt-0 col-span-3">
+            <table class="table-fixed mt-0 col-span-3">
                 <thead class="text-xs text-left text-gray-700 uppercase bg-gray-50">
                     <tr>
                         <th scope="col" class="py-3 border-r max-w-fit" v-if="allowMultiActions">
@@ -85,7 +85,7 @@ const selectedChange = () => {
                             </div>
                         </th>
                         <th scope="col" class="px-6 py-3 border-r" v-for="name in headerNames">{{ name }}</th>
-                        <th scope="col" class="py-3 max-w-fit" v-if="allowEdit || allowDelete"></th>
+                        <th scope="col" class="py-3 max-w-fit" v-if="allowEdit || allowDelete || detailsURL"></th>
                     </tr>
                 </thead>
                 <tbody class="text-xs md:text-sm lg:text-base">

@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('subject_teachers', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id');
-            $table->integer('subject_id');
+            $table->foreignId('user_id');
+            $table->foreignId('subject_id');
             $table->string('custom_name')->nullable();
             $table->timestamps();
         });

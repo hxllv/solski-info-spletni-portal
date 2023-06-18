@@ -31,23 +31,27 @@ class DatabaseSeeder extends Seeder
             ['name' => 'teacher'],
             ['name' => 'admin.panel.view'],
             ['name' => 'users.view'],
-            ['name' => 'users.invite']
+            ['name' => 'users.invite'],
+            ['name' => 'roles.view'],
+            ['name' => 'classes.view'],
+            ['name' => 'subjects.view'],
         ]);
         \App\Models\Permission::factory()->hasAttached($admin)->createMany([
             ['name' => 'users.edit'],
             ['name' => 'users.delete'],
-            ['name' => 'roles.view'],
             ['name' => 'roles.create'],
             ['name' => 'roles.edit'],
-            ['name' => 'roles.delete'],
-            ['name' => 'classes.view'],
+            ['name' => 'roles.delete'], 
             ['name' => 'classes.create'],
             ['name' => 'classes.edit'],
             ['name' => 'classes.delete'],
-            ['name' => 'subjects.view'],
             ['name' => 'subjects.create'],
             ['name' => 'subjects.edit'],
-            ['name' => 'subjects.delete']
+            ['name' => 'subjects.delete'],
+            ['name' => 'timetable.view'],
+            ['name' => 'timetable.create'],
+            ['name' => 'timetable.edit'],
+            ['name' => 'timetable.delete']
         ]);
 
         $adminUser = \App\Models\User::factory()->for($admin)->create([
