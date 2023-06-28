@@ -22,11 +22,11 @@ const logout = () => {
 const getAdminRoute = () => {
     if (props.permission.includes('users.view'))
         return route('users')
-    if (props.permission.includes('roles.view'))
+    else if (props.permission.includes('roles.view'))
         return route('roles')
-    if (props.permission.includes('classes.view'))
+    else if (props.permission.includes('classes.view'))
         return route('classes')
-    if (props.permission.includes('subjects.view'))
+    else if (props.permission.includes('subjects.view'))
         return route('subjects')
     return route('dashboard')
 }
