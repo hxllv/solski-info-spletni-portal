@@ -6,6 +6,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SchoolClassController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TimetableEntryController;
+use App\Http\Controllers\SettingController;
 use App\Models\Permission;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -104,6 +105,12 @@ Route::middleware([
 
         Route::post('/timetable', [TimetableEntryController::class, 'store'])->name('create.timetable');
         Route::post('/timetable/{entry}', [TimetableEntryController::class, 'destroy'])->name('timetable.delete');
+
+        // settings
+
+        Route::get('/settings', [SettingController::class, 'index'])->name('settings');
+        Route::put('/settings/{setting}', [SettingController::class, 'update'])->name('setting.update');
+
     })->name('admin');
 });
 

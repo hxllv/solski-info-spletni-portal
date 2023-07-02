@@ -34,6 +34,8 @@ class RoleController extends Controller
             'subjects.edit',
             'subjects.delete',
             'timetable.edit',
+            'settings.edit',
+            'settings.view',
         ];
     }
 

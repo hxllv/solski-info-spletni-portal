@@ -51,7 +51,9 @@ class DatabaseSeeder extends Seeder
             ['name' => 'timetable.view'],
             ['name' => 'timetable.create'],
             ['name' => 'timetable.edit'],
-            ['name' => 'timetable.delete']
+            ['name' => 'timetable.delete'],
+            ['name' => 'settings.edit'],
+            ['name' => 'settings.view'],
         ]);
 
         $adminUser = \App\Models\User::factory()->for($admin)->create([
@@ -90,5 +92,41 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $studentUser->studentOf()->associate($class)->save();
+
+        \App\Models\Setting::factory()->create([
+            'name' => 'timetable.hours',
+            'value' => json_encode([
+                0 => [
+                    'index' => -1,
+                    'name' => '0. ura',
+                    'from' => '7:10',
+                    'to' => '7:55',
+                ],
+                1 => [
+                    'index' => 0,
+                    'name' => '1. ura',
+                    'from' => '8:00',
+                    'to' => '8:45',
+                ],
+                2 => [
+                    'index' => 1,
+                    'name' => '2. ura',
+                    'from' => '8:50',
+                    'to' => '9:35',
+                ],
+                3 => [
+                    'index' => 2,
+                    'name' => 'Malica',
+                    'from' => '9:40',
+                    'to' => '10:00',
+                ],
+                4 => [
+                    'index' => 3,
+                    'name' => '3. ura',
+                    'from' => '10:05',
+                    'to' => '10:50',
+                ],
+            ])
+        ]);
     }
 }

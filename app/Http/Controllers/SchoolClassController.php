@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\SchoolClass;
+use App\Models\Setting;
 use App\Models\SubjectTeacher;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -109,6 +110,7 @@ class SchoolClassController extends Controller
             'roles' => Role::all(),
             'subjects' => $teacherSubject,
             'timetableEntries' => $timetableEntries,
+            'hours' => Setting::find('timetable.hours'),
             'params' => [
                 'page' => request()->input('page'),
                 'term' => $data['term'],

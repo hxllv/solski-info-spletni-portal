@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('timetable_entries', function (Blueprint $table) {
             $table->id();
             $table->integer('day');
-            $table->integer('hour');
+            $table->decimal('hour', 8, 1);
             $table->foreignId('subject_teacher_id')->nullable()->references('id')->on('subject_teachers')->onDelete('cascade');
             $table->foreignId('school_class_id')->references('id')->on('school_classes')->onDelete('cascade');
             $table->timestamps();
