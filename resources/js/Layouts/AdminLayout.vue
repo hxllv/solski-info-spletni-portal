@@ -51,6 +51,11 @@ router.on('finish', () => {
                     Predmeti
                 </Tab>
             </li>
+            <li class="mr-2" v-if="permission.includes('subjects.view')">
+                <Tab :href="route('settings')" :active="route().current('settings')">
+                    Ostalo
+                </Tab>
+            </li>
         </ul>
 
         <div class="m-2 max-w-7xl mt-0 sm:px-6 lg:px-8 mx-auto flex flex-wrap ">

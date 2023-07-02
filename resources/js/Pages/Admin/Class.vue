@@ -18,6 +18,7 @@ const props = defineProps({
     roles: Array,
     subjects: Array,
     timetableEntries: Array,
+    hours: Object,
     students: Object,
     params: Object,
     permission: Array,
@@ -229,7 +230,7 @@ const usersModAdding = computed(() => {
 
                 <div class="p-4"></div>
 
-                <Timetable :subjects="subjects" :classId="sClass.id" :data="timetableEntries" :allowEdit="permission.includes('timetable.edit')" :buffer="layout.buffer" @refresh="refresh" />
+                <Timetable :subjects="subjects" :classId="sClass.id" :data="timetableEntries" :hours="hours" :allowEdit="permission.includes('timetable.edit')" :buffer="layout.buffer" @refresh="refresh" />
 
                 <DialogModal :show="addingUsers" @close="closeAddingModal" maxWidth="4xl"> 
                     <template #title>

@@ -9,7 +9,7 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import * as all from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
-library.add(all.faPen, all.faTrashCan, all.faChevronLeft, all.faChevronRight, all.faArrowLeft, all.faInfoCircle)
+library.add(all.faPen, all.faTrashCan, all.faChevronLeft, all.faChevronRight, all.faArrowLeft, all.faInfoCircle, all.faArrowUp, all.faArrowDown)
 
 const appName = window.document.getElementsByTagName('title')[0]?.innerText || 'Laravel';
 

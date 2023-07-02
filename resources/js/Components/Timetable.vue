@@ -12,6 +12,7 @@ import Select from '@/Components/Select.vue';
 const props = defineProps({
     data: Array,
     subjects: Array,
+    hours: Object,
     classId: Number,
     allowEdit: {
         type: Boolean,
@@ -22,10 +23,10 @@ const props = defineProps({
 
 const emit = defineEmits(['refresh']);
 
+const hourEntries = JSON.parse(props.hours.value);
 const colNum = Array.from(Array(5).keys());
-const rowNum = ref(Array.from(Array(6).keys()));
 
-const itemData = ref({})
+const itemData = ref({});
 const addingTimetableEntry = ref(false);
 const entryToInsert = ref(false);
 
@@ -39,16 +40,6 @@ const refreshTimetable = () => {
     emit('refresh')
 
     itemData.value = {}
-
-    if (props.data.length) {
-        //get max hour
-        let maxHour = props.data.reduce((prev, current) => (prev.hour > current.hour) ? prev : current).hour + 1
-
-        if (props.allowEdit)
-            maxHour++
-
-        rowNum.value = Array.from(Array(maxHour > 6 ? maxHour : 6).keys())
-    }
 
     props.data.forEach((value) => {
         const tempUser = props.subjects.filter((sub) => value.subject_teacher.user_id == sub.user.id)[0].user
@@ -120,23 +111,26 @@ const removeTimetableEntry = (id) => {
                     </tr>
                 </thead>
                 <tbody class="text-xs md:text-sm lg:text-base">
-                    <tr v-for="row in rowNum" class="bg-white border-b hover:bg-gray-100">
-                        <td class="p-3 border-r text-center text-gray-600">{{ row }}. ura</td>
+                    <tr v-for="row in hourEntries" class="bg-white border-b hover:bg-gray-100">
+                        <td class="p-3 border-r text-center text-gray-600">
+                            <div>{{ row.name }}</div>    
+                            <div class="text-xs text-gray-700">{{ row.from }} - {{ row.to }}</div>    
+                        </td>
                         <td class="px-6 py-3 border-r" v-for="col in colNum">
-                            <div v-if="!itemData[`${row}-${col}`] && allowEdit">
-                                <SecondaryButton @click="openAddingModal(row, col)">
+                            <div v-if="!itemData[`${row.index}-${col}`] && allowEdit">
+                                <SecondaryButton @click="openAddingModal(row.index, col)">
                                     Dodaj
                                 </SecondaryButton>
                             </div>
-                            <div v-if="itemData[`${row}-${col}`]">
+                            <div v-if="itemData[`${row.index}-${col}`]">
                                 <div>
-                                    {{ itemData[`${row}-${col}`].subject }}
+                                    {{ itemData[`${row.index}-${col}`].subject }}
                                 </div>
                                 <div class="text-gray-600 text-xs">
-                                    {{ itemData[`${row}-${col}`].fullname }}
+                                    {{ itemData[`${row.index}-${col}`].fullname }}
                                 </div>
                                 <div class="flex justify-end px-1">
-                                    <a class="cursor-pointer" v-if="allowEdit" @click="removeTimetableEntry(itemData[`${row}-${col}`].id)">
+                                    <a class="cursor-pointer" v-if="allowEdit" @click="removeTimetableEntry(itemData[`${row.index}-${col}`].id)">
                                         <font-awesome-icon icon="fa-solid fa-trash-can" class="text-gray-700 px-2"/>
                                     </a>
                                 </div>
