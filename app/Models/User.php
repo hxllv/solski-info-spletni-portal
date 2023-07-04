@@ -69,4 +69,8 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Subject::class, 'subject_teachers', 'user_id')->withPivot('custom_name')->withTimestamps();
     }
+
+    public function teacherOfPivot() {
+        return $this->hasMany(SubjectTeacher::class);
+    }
 }

@@ -7,6 +7,7 @@ use App\Http\Controllers\SchoolClassController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TimetableEntryController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\DashboardController;
 use App\Models\Permission;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -44,27 +45,15 @@ use Laravel\Jetstream\Jetstream;
 */
 
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        //'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-})->name('indexer');
+    return redirect('dashboard');
+});
 
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
-    Route::get('/dashboard', function () {
-        $permissions = auth()->user()->role->permissions->pluck('name')->toArray();
-
-        if (auth()->user()->is_account_owner) 
-            $permissions = Permission::all()->pluck('name')->toArray();
-
-        return Inertia::render('Dashboard', ['permission' => $permissions]);
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::prefix('admin')->group(function () {
         // uporabniki

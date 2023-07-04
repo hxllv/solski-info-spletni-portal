@@ -23,6 +23,5 @@ const props = defineProps({
                 <EditHours :hours="hours"/>   
             </div>
         </div>
-
     </AdminLayout>
 </template>

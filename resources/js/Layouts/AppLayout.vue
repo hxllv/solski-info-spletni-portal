@@ -28,6 +28,8 @@ const getAdminRoute = () => {
         return route('classes')
     else if (props.permission.includes('subjects.view'))
         return route('subjects')
+    else if (props.permission.includes('settings.view'))
+        return route('settings')
     return route('dashboard')
 }
 
@@ -56,7 +58,7 @@ const adminRoute = ref(getAdminRoute());
                             <!-- Navigation Links -->
                             <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                                 <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
-                                    Dashboard
+                                    Namizje
                                 </NavLink>
                             </div>
 
@@ -65,7 +67,8 @@ const adminRoute = ref(getAdminRoute());
                                     route().current('users') ||
                                     route().current('roles') ||
                                     route().current('classes') ||
-                                    route().current('subjects')
+                                    route().current('subjects') ||
+                                    route().current('settings')
                                 ">
                                     Admin
                                 </NavLink>

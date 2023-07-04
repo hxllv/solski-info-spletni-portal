@@ -45,15 +45,23 @@ const refreshTimetable = () => {
         const tempUser = props.subjects.filter((sub) => value.subject_teacher.user_id == sub.user.id)[0].user
         const tempSubject = props.subjects.filter((sub) => value.subject_teacher.subject_id == sub.subject.id)[0].subject.name
 
-        itemData.value[`${value.hour}-${value.day}`] = {
+        let className;
+        if (value.school_class) {
+            className = value.school_class.name
+        }
+
+        itemData.value[`${Number(value.hour)}-${value.day}`] = {
             subject: value.subject_teacher.custom_name ? value.subject_teacher.custom_name : tempSubject,
             fullname: `${tempUser.name} ${tempUser.surname}`,
+            className: className,
             id: value.id
         }
     })
 }
 
 onMounted(() => {
+    if (props.data)
+
     refreshTimetable()
 })
 
@@ -111,7 +119,7 @@ const removeTimetableEntry = (id) => {
                     </tr>
                 </thead>
                 <tbody class="text-xs md:text-sm lg:text-base">
-                    <tr v-for="row in hourEntries" class="bg-white border-b hover:bg-gray-100">
+                    <tr v-for="row in hourEntries" class="bg-white border-b hover:bg-gray-100">      
                         <td class="p-3 border-r text-center text-gray-600">
                             <div>{{ row.name }}</div>    
                             <div class="text-xs text-gray-700">{{ row.from }} - {{ row.to }}</div>    
@@ -127,7 +135,7 @@ const removeTimetableEntry = (id) => {
                                     {{ itemData[`${row.index}-${col}`].subject }}
                                 </div>
                                 <div class="text-gray-600 text-xs">
-                                    {{ itemData[`${row.index}-${col}`].fullname }}
+                                    {{ itemData[`${row.index}-${col}`].className || itemData[`${row.index}-${col}`].fullname }}
                                 </div>
                                 <div class="flex justify-end px-1">
                                     <a class="cursor-pointer" v-if="allowEdit" @click="removeTimetableEntry(itemData[`${row.index}-${col}`].id)">
