@@ -1,5 +1,4 @@
 <script setup>
-import { ref } from 'vue';
 import { useForm } from '@inertiajs/vue3';
 import FormSection from '@/Components/FormSection.vue';
 import InputError from '@/Components/InputError.vue';
@@ -11,7 +10,9 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 
 const props = defineProps({
     roles: Array,
-    classes: Array
+    classes: Array,
+    params: Object,
+    buffer: Boolean
 });
 
 const form = useForm({
@@ -38,7 +39,8 @@ const postNewUserData = () => {
         </template>
 
         <template #description>
-            Dodajanje uporabnika. Uporabniku bo na dani email naslov poslan invite.
+            <p>Uporabniku bo na dani email naslov poslan povabilo za registracijo.</p>
+            <p class="pt-2">Otroke lahko dodate uporabniku po tem ko mu pošljete povabilo.</p>
         </template>
 
         <template #form>

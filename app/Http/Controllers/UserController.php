@@ -23,12 +23,14 @@ class UserController extends Controller
         $data = request()->validate([
             'term' => 'string|nullable',
             'role' => 'numeric|nullable',
+            'reg' => 'string|nullable',
         ]); 
 
         $mQuery = User::query();
 
         $data['term'] = $data['term'] ?? '';
         $data['role'] = $data['role'] ?? '';
+        $data['reg'] = $data['reg'] ?? '';
 
         $mQuery->where(function ($query) use ($data) {
             $query->where('surname', 'LIKE', '%'.$data['term'].'%')
@@ -38,6 +40,15 @@ class UserController extends Controller
 
         if ($data['role'] !== '') 
             $mQuery->where('role_id', $data['role']);
+
+        switch ($data['reg']) {
+            case 'reg':
+                $mQuery->where('is_registered', true);
+                break;
+            case 'neg':
+                $mQuery->where('is_registered', false);
+                break;
+        }
 
         $permissions = auth()->user()->role->permissions->pluck('name')->toArray();
 
@@ -59,6 +70,85 @@ class UserController extends Controller
         );
     }
 
+    public function view(User $user): Response
+    {
+        $this->authorize('view', User::class);
+
+        $data = request()->validate([
+            'term' => 'string|nullable',
+            'role' => 'numeric|nullable',
+            'term_adding' => 'string|nullable',
+            'role_adding' => 'numeric|nullable',
+        ]);
+
+        // children
+
+        $mQuery = $user->parentOf();
+
+        $data['term'] = $data['term'] ?? '';
+        $data['role'] = $data['role'] ?? '';
+
+        $mQuery->where(function ($query) use ($data) {
+            $query->where('surname', 'LIKE', '%'.$data['term'].'%')
+                ->orWhere('email', 'LIKE', '%'.$data['term'].'%')
+                ->orWhere('name', 'LIKE', '%'.$data['term'].'%');
+        });
+
+        if ($data['role'] !== '') 
+            $mQuery->where('role_id', $data['role']);
+
+        // parents
+
+        $parents = $user->parent;
+
+        // potential children
+
+        $nQuery = User::query();
+
+        $data['term_adding'] = $data['term_adding'] ?? '';
+        $data['role_adding'] = $data['role_adding'] ?? '';
+
+        $nQuery->where(function ($query) use ($data) {
+            $query->where('surname', 'LIKE', '%'.$data['term_adding'].'%')
+                ->orWhere('email', 'LIKE', '%'.$data['term_adding'].'%')
+                ->orWhere('name', 'LIKE', '%'.$data['term_adding'].'%');
+        });
+
+        if ($data['role_adding'] !== '') 
+            $nQuery->where('role_id', $data['role_adding']);
+
+        // exclude already children and viewing user
+
+        $filteredUsers = $nQuery->get()->pluck('id')->toArray();
+        $children = $user->parentOf->pluck('id')->toArray();
+
+        $potentialChildren = User::whereIn('id', array_diff($filteredUsers, $children, [$user->id]));
+
+        // get user permissions
+
+        $permissions = auth()->user()->role->permissions->pluck('name')->toArray();
+
+        if (auth()->user()->is_account_owner) 
+            $permissions = Permission::all()->pluck('name')->toArray();
+
+        return Inertia::render('Admin/User', 
+        [
+            'user' => $user,
+            'children' => $mQuery->with('role')->paginate(10),
+            'parents' => $parents,
+            'potentialChildren' => $potentialChildren->with('role')->paginate(10, ['*'], 'ps_page'),
+            'roles' => Role::all(),
+            'params' => [
+                'page' => request()->input('page'),
+                'term' => $data['term'],
+                'term_adding' => $data['term_adding'],
+                'role' => $data['role'],
+                'role_adding' => $data['role_adding'],
+            ],
+            'permission' => $permissions
+        ]);
+    }
+
     public function update(User $user, Request $request, UpdatesUserProfileInformation $updater)
     {
         $this->authorize('edit', User::class);
@@ -78,15 +168,22 @@ class UserController extends Controller
         $this->authorize('edit', User::class);
 
         $data = request()->validate([
-            'class' => [Rule::excludeIf(!empty(request()->input('role'))), 'numeric', 'required'],
-            'role' => [Rule::excludeIf(!empty(request()->input('class'))), 'numeric', 'required'],
+            'class' => [Rule::excludeIf(!empty(request()->input('role')) || !empty(request()->input('parent'))), 'numeric', 'required'],
+            'role' => [Rule::excludeIf(!empty(request()->input('class')) || !empty(request()->input('parent'))), 'numeric', 'required'],
+            'parent' => [Rule::excludeIf(!empty(request()->input('class')) || !empty(request()->input('role'))), 'numeric', 'required'],
             'userIds' => 'required|array',
         ]); 
 
         $users = User::find($data['userIds']);
 
+        foreach ($users as $user)
+            if (User::find($user->id)->get()->count() === 0)
+                return redirect()->back()->withErrors([
+                    'userIds' => 'Neveljavni uporabnik med izbranimi.'
+                ]);
+
         if (!empty($data['class'])) {
-            if ($data['class'] != -1 && Role::find($data['class'])->get()->count() === 0)
+            if ($data['class'] != -1 && SchoolClass::find($data['class'])->get()->count() === 0)
                 return redirect()->back()->withErrors([
                     'class' => 'Neveljavni razred.'
                 ]);
@@ -108,6 +205,21 @@ class UserController extends Controller
             foreach ($users as $user) {
                 $user->role()->associate($data['role'])->save();
             }
+        }
+        else if (!empty($data['parent'])) {
+            $parentCorrected = User::find(abs($data['parent']));
+            if ($parentCorrected->get()->count() === 0)
+                return redirect()->back()->withErrors([
+                    'parent' => 'Neveljavni uporabnik.'
+                ]);
+
+            $userIds = $users->pluck('id')->toArray();
+
+            if ($data['parent'] < 0) {
+                $parentCorrected->parentOf()->detach($userIds);
+                return;
+            }
+            $parentCorrected->parentOf()->sync($userIds, false);
         }
     }
 

@@ -48,10 +48,7 @@ class DatabaseSeeder extends Seeder
             ['name' => 'subjects.create'],
             ['name' => 'subjects.edit'],
             ['name' => 'subjects.delete'],
-            ['name' => 'timetable.view'],
-            ['name' => 'timetable.create'],
             ['name' => 'timetable.edit'],
-            ['name' => 'timetable.delete'],
             ['name' => 'settings.edit'],
             ['name' => 'settings.view'],
         ]);

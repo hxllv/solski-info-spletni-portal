@@ -53,13 +53,16 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::prefix('dashboard')->group(function () {
+        Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    });
 
     Route::prefix('admin')->group(function () {
         // uporabniki
 
         Route::get('/users', [UserController::class, 'index'])->name('users');
         Route::post('/inviteUser', [InviteController::class, 'send'])->name('invite.user');
+        Route::get('/user/{user}', [UserController::class, 'view'])->name('view.user');
         Route::delete('/user/{user}', [UserController::class, 'destroy'])->name('user.delete');
         Route::put('/user/{user}', [UserController::class, 'update'])->name('user.update');
 
@@ -100,7 +103,8 @@ Route::middleware([
         Route::get('/settings', [SettingController::class, 'index'])->name('settings');
         Route::put('/settings/{setting}', [SettingController::class, 'update'])->name('setting.update');
 
-    })->name('admin');
+    });
+
 });
 
 // Fortify zadeve

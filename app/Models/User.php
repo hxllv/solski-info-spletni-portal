@@ -26,7 +26,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name', 'surname', 'email', 'password', 'is_account_owner'
+        'name', 'surname', 'email', 'password', 'is_account_owner', 'is_registered'
     ];
 
     /**
@@ -72,5 +72,13 @@ class User extends Authenticatable
 
     public function teacherOfPivot() {
         return $this->hasMany(SubjectTeacher::class);
+    }
+
+    public function parent() {
+        return $this->belongsToMany(User::class, 'parents', 'child_id', 'parent_id');
+    }
+
+    public function parentOf() {
+        return $this->belongsToMany(User::class, 'parents', 'parent_id', 'child_id');
     }
 }
