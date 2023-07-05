@@ -68,7 +68,10 @@ const adminRoute = ref(getAdminRoute());
                                     route().current('roles') ||
                                     route().current('classes') ||
                                     route().current('subjects') ||
-                                    route().current('settings')
+                                    route().current('settings') ||
+                                    route().current('view.user') ||
+                                    route().current('view.subject') ||
+                                    route().current('view.class')
                                 ">
                                     Admin
                                 </NavLink>

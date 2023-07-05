@@ -23,12 +23,17 @@ const props = defineProps({
 
 const addingTeacher = ref(false);
 const removingTeacher = ref(false);
+const selectedUsersAdding = ref(false);
+const selectedUsers = ref(false);
+const multiActionsAddingClass = ref('opacity-30 pointer-events-none');
+const multiActionsClass = ref('opacity-30 pointer-events-none');
+
 const formAdd = useForm({
-    teacher: '',
     custom_name: '',
+    detaching: false,
 });
 const formDelete = useForm({
-    teacher: '',
+    detaching: true,
 });
 const formFilter = useForm({
     term: '',
@@ -38,11 +43,40 @@ const formFilter = useForm({
 formFilter.term = props.params.term
 formFilter.role = props.params.role
 
+const formFilterAdding = useForm({
+    term_adding: '',
+    role_adding: '',
+});
+
+formFilterAdding.term_adding = props.params.term_adding
+formFilterAdding.role_adding = props.params.role_adding
+
 // adding teachers
+
+const onAddingSelectChange = (val) => {
+    selectedUsersAdding.value = val.length > 0 ? val : false;
+
+    multiActionsAddingClass.value = ''
+    if (!selectedUsersAdding.value)
+        multiActionsAddingClass.value = 'opacity-30 pointer-events-none'
+}
 
 const closeAddingModal = () => {
     addingTeacher.value = false;
     formAdd.reset();
+
+    router.get(
+        route('view.subject', props.subject.id), 
+        {
+            page: props.params.page, 
+            term: props.params.term,
+            role: props.params.role,
+        },
+        {
+            preserveState: true,
+            preserveScroll: true,
+        }
+    )
 };
 
 const openAddingModal = () => {
@@ -50,7 +84,10 @@ const openAddingModal = () => {
 };
 
 const addUsers = () => {
-    formAdd.post(route('subject.toggle', props.subject.id), {
+    formAdd.transform((data) => ({
+        ...data,
+        userIds: selectedUsersAdding.value,
+    })).post(route('subject.toggle', props.subject.id), {
         preserveScroll: true,
         onSuccess: () => closeAddingModal(),
         onError: () => {},
@@ -59,18 +96,28 @@ const addUsers = () => {
 
 // removing teachers
 
+const onSelectChange = (val) => {
+    selectedUsers.value = val.length > 0 ? val : false;
+
+    multiActionsClass.value = ''
+    if (!selectedUsers.value)
+        multiActionsClass.value = 'opacity-30 pointer-events-none'
+}
+
 const closeRemoveModal = () => {
     removingTeacher.value = false;
     formDelete.reset();
 };
 
-const openRemoveModal = (id) => {
+const openRemoveModal = () => {
     removingTeacher.value = true;
-    formDelete.teacher = id;
 };
 
 const removeUsers = () => {
-    formDelete.post(route('subject.toggle', props.subject.id), {
+    formDelete.transform((data) => ({
+        ...data,
+        userIds: selectedUsers.value,
+    })).post(route('subject.toggle', props.subject.id), {
         preserveScroll: true,
         onSuccess: () => closeRemoveModal(),
         onError: () => {},
@@ -86,6 +133,8 @@ const usersMod = computed(() => {
 
     newUsers.data.forEach(user => {
         user.fullname = `${user.name} ${user.surname}`
+        if (!user.is_registered)
+            user.fullname += ' (neregistriran)'
         user.role = user.role.name
         user.custom = user.pivot.custom_name ? user.pivot.custom_name : props.subject.name
 
@@ -97,7 +146,22 @@ const usersMod = computed(() => {
     return newUsers
 });
 
-console.log(props.potentialTeachers)
+const usersModAdding = computed(() => {
+    let newUsers = JSON.parse(JSON.stringify(props.potentialTeachers));
+
+    newUsers.data.forEach(user => {
+        user.fullname = `${user.name} ${user.surname}`
+        if (!user.is_registered)
+            user.fullname += ' (neregistriran)'
+        user.role = user.role.name
+
+        hatedProps.forEach(prop => {
+            delete user[prop]
+        })
+    })
+
+    return newUsers
+});
 </script>
 
 <template>
@@ -145,6 +209,9 @@ console.log(props.potentialTeachers)
 
                 <div class="md:grid md:grid-cols-3 md:gap-6" v-if="permission.includes('subjects.edit')">
                     <div class="mt-5 md:mt-0 md:col-span-1 p-2">
+                        <SecondaryButton class="mr-1" :class="multiActionsClass" @click="openRemoveModal">
+                            Odstrani nosilce
+                        </SecondaryButton>
                         <PrimaryButton @click="openAddingModal">
                             Dodaj nosilca
                         </PrimaryButton>
@@ -153,10 +220,10 @@ console.log(props.potentialTeachers)
 
                 <Table :data="usersMod" :headerNames="['Naziv', 'Ime', 'Email', 'Skupina pravic']" 
                     :sortedAs="['custom', 'fullname', 'email', 'role']" 
-                    :allowEdit="false" :allowDelete="permission.includes('subjects.edit')" :allowMultiActions="false"
-                    @delete="openRemoveModal"
+                    :allowEdit="false" :allowDelete="false" :allowMultiActions="permission.includes('subjects.edit')"
                     :query="{ term: formFilter.term, role: formFilter.role }"
                     :buffer="layout.buffer"
+                    @selectedChange="onSelectChange"
                     routeName="view.subject"
                     :routeParams="[subject.id]"
                 />
@@ -165,11 +232,12 @@ console.log(props.potentialTeachers)
 
                 <DialogModal :show="removingTeacher" @close="closeRemoveModal"> 
                     <template #title>
-                        Odstrani nosilca?
+                        Odstrani nosilce?
                     </template>
 
                     <template #content>
-                        Vsi podatki vezani na tega nosilca bodo izbrisani!
+                        <p>Vsi podatki vezani na te nosilce bodo izbrisani!</p>
+                        <p class="py-2">(Ocene v redovalnici, izostanki, datumi ocenjevanja, vnosi v urnik, nadomeščanja)</p>
 
                         <InputError :message="formDelete.errors.teacher" class="mt-2" />
                     </template>
@@ -190,7 +258,7 @@ console.log(props.potentialTeachers)
 
                 <!-- adding teachers -->
 
-                <DialogModal :show="addingTeacher" @close="closeAddingModal"> 
+                <DialogModal :show="addingTeacher" @close="closeAddingModal" maxWidth="4xl"> 
                     <template #title>
                         Dodaj nosilca
                     </template>
@@ -200,19 +268,6 @@ console.log(props.potentialTeachers)
                                 class="px-4 py-5 bg-white sm:p-6"
                             >
                                 <div class="grid grid-cols-6 gap-6">
-                                    <!-- Teacher -->
-                                    <div class="col-span-6 sm:col-span-4">
-                                        <InputLabel for="class" value="Nosilec" />
-                                        <Select
-                                            id="class"
-                                            v-model="formAdd.teacher"
-                                            class="mt-1 block w-full"
-                                            autocomplete="class"
-                                        >
-                                            <option v-for="teacher in potentialTeachers" :value="teacher.id">{{`${teacher.name} ${teacher.surname} - ${teacher.email}`}}</option>
-                                        </Select>
-                                        <InputError :message="formAdd.errors.teacher" class="mt-2" />
-                                    </div>
                                     <!-- Name -->
                                     <div class="col-span-6 sm:col-span-4">
                                         <InputLabel for="name" value="Naziv (neobvezno)" />
@@ -228,6 +283,54 @@ console.log(props.potentialTeachers)
                                 </div>
                             </div>
                         </form>
+                        <div class="md:grid md:grid-cols-3 md:gap-6">
+                            <div class="mt-5 md:mt-0 md:col-span-1 p-2">
+                                <InputLabel for="term" value="Iskalni niz" />
+                                <TextInput
+                                    id="term"
+                                    v-model="formFilterAdding.term_adding"
+                                    type="text"
+                                    class="mt-1 block w-full"
+                                    autocomplete="term"
+                                />
+                            </div>
+                            <div class="mt-5 md:mt-0 md:col-span-1 p-2">
+                                <InputLabel for="roleFilter" value="Skupina pravic" />
+                                <Select
+                                    id="roleFilter"
+                                    v-model="formFilterAdding.role_adding"
+                                    class="mt-1 block w-full"
+                                    autocomplete="role"
+                                    :defaultValue="''"
+                                >
+                                    <option value="">Vsi</option>
+                                    <option v-for="role in roles" :value="role.id">{{role.name}}</option>
+                                </Select>
+                            </div>
+                            <div class="mt-5 md:mt-0 md:col-span-1 p-2 text-right flex items-end justify-end">
+                                <Link preserve-scroll preserve-state :href="route('view.subject', subject.id)" :data="{ page: props.params.page, ps_page: 1, term_adding: '', role_adding: '' }" class="mr-1" @click="formFilterAdding.reset()">
+                                    <SecondaryButton>
+                                        Ponastavi
+                                    </SecondaryButton>
+                                </Link>
+
+                                <Link preserve-scroll preserve-state :href="route('view.subject', subject.id)" :data="{ page: props.params.page, ps_page: 1, term_adding: formFilterAdding.term_adding, role_adding: formFilterAdding.role_adding }">
+                                    <PrimaryButton>
+                                        Uporabi
+                                    </PrimaryButton>
+                                </Link>
+                            </div>
+                        </div>
+                        <Table :data="usersModAdding" :headerNames="['Ime', 'Email', 'Skupina pravic']" 
+                            :sortedAs="['fullname', 'email', 'role']" 
+                            :allowEdit="false" :allowDelete="false" :allowMultiActions="true"
+                            :query="{ page: props.params.page, term: formFilter.term, role: formFilter.role, term_adding: formFilterAdding.term_adding, role_adding: formFilterAdding.role_adding }"
+                            :buffer="layout.buffer"
+                            @selectedChange="onAddingSelectChange"
+                            pageName="ps_page"
+                            routeName="view.subject"
+                            :routeParams="[subject.id]"
+                        />
                     </template>
 
                     <template #footer>
@@ -237,6 +340,7 @@ console.log(props.potentialTeachers)
 
                         <PrimaryButton
                             class="ml-3"
+                            :class="multiActionsAddingClass"
                             @click="addUsers"
                         >
                             Shrani

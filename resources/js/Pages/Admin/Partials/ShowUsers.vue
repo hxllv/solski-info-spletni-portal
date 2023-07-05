@@ -40,7 +40,8 @@ const formEdit = useForm({
 });
 const formFilter = useForm({
     term: '',
-    role: ''
+    role: '',
+    reg: ''
 });
 
 formFilter.term = props.params.term
@@ -151,6 +152,8 @@ const usersMod = computed(() => {
 
     newUsers.data.forEach(user => {
         user.fullname = `${user.name} ${user.surname}`
+        if (!user.is_registered)
+            user.fullname += ' (neregistriran)'
         user.role = user.is_account_owner ? 'Glavni administrator' : user.role.name
         user.class = user.student_of ? user.student_of.name : '/'
 
@@ -161,6 +164,8 @@ const usersMod = computed(() => {
 
     return newUsers
 });
+
+console.log(props.users)
 </script>
 
 <template>
@@ -183,20 +188,31 @@ const usersMod = computed(() => {
                 v-model="formFilter.role"
                 class="mt-1 block w-full"
                 autocomplete="role"
-                :defaultValue="''"
             >
                 <option value="">Vsi</option>
                 <option v-for="role in roles" :value="role.id">{{role.name}}</option>
             </Select>
         </div>
-        <div class="mt-5 md:mt-0 md:col-span-1 p-2 text-right flex items-end justify-end">
-            <Link preserve-scroll preserve-state :href="route('users')" :data="{ page: 1, term: '', role: '' }" class="mr-1" @click="formFilter.reset()">
+        <div class="mt-5 md:mt-0 md:col-span-1 p-2">
+            <InputLabel for="regFilter" value="Status registracije" />
+            <Select
+                id="regFilter"
+                v-model="formFilter.reg"
+                class="mt-1 block w-full"
+            >
+                <option value="">Vsi</option>
+                <option value="reg">Registrirani</option>
+                <option value="neg">Neregistrirani</option>
+            </Select>
+        </div>
+        <div class="mt-5 md:mt-0 md:col-start-3 md:row-start-2 p-2 text-right flex items-end justify-end">
+            <Link preserve-scroll preserve-state :href="route('users')" :data="{ page: 1, term: '', role: '', reg: '' }" class="mr-1" @click="formFilter.reset()">
                 <SecondaryButton>
                     Ponastavi
                 </SecondaryButton>
             </Link>
 
-            <Link preserve-scroll preserve-state :href="route('users')" :data="{ page: 1, term: formFilter.term, role: formFilter.role }">
+            <Link preserve-scroll preserve-state :href="route('users')" :data="{ page: 1, term: formFilter.term, role: formFilter.role, reg: formFilter.reg }">
                 <PrimaryButton>
                     Uporabi
                 </PrimaryButton>
@@ -234,6 +250,7 @@ const usersMod = computed(() => {
         :allowMultiActions="true"
         @edit="openEditModal" 
         @delete="openDeleteModal"
+        detailsURL="view.user"
         :query="{ term: formFilter.term, role: formFilter.role }"
         :buffer="buffer"
         @selectedChange="onSelectChange"

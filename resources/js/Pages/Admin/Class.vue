@@ -39,9 +39,13 @@ formFilter.term = props.params.term
 formFilter.role = props.params.role
 
 const formFilterAdding = useForm({
-    term_adding: props.params.term_adding,
-    role_adding: props.params.role_adding,
+    term_adding: '',
+    role_adding: '',
 });
+
+formFilterAdding.term_adding = props.params.term_adding
+formFilterAdding.role_adding = props.params.role_adding
+
 const formDissociate = useForm({});
 const formAssociate = useForm({});
 
@@ -131,6 +135,8 @@ const usersMod = computed(() => {
 
     newUsers.data.forEach(user => {
         user.fullname = `${user.name} ${user.surname}`
+        if (!user.is_registered)
+            user.fullname += ' (neregistriran)'
         user.role = user.role.name
 
         hatedProps.forEach(prop => {
@@ -146,6 +152,8 @@ const usersModAdding = computed(() => {
 
     newUsers.data.forEach(user => {
         user.fullname = `${user.name} ${user.surname}`
+        if (!user.is_registered)
+            user.fullname += ' (neregistriran)'
         user.role = user.role.name
         user.class = user.student_of ? user.student_of.name : '/'
 

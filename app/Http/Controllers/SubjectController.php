@@ -53,6 +53,8 @@ class SubjectController extends Controller
         $data = request()->validate([
             'term' => 'string|nullable',
             'role' => 'numeric|nullable',
+            'term_adding' => 'string|nullable',
+            'role_adding' => 'numeric|nullable',
         ]);
 
         // teachers
@@ -75,10 +77,29 @@ class SubjectController extends Controller
 
         // not a great way to find users 
 
-        $allUsers = Permission::find('teacher')->roles()->with('users')->get()->pluck('users')->flatten()->pluck('id')->toArray();
-        $subjectUsers = $subject->teachedBy->pluck('id')->toArray();
+        $rolesWithTeacher = Permission::find('teacher')->roles->pluck('id')->toArray();
+        $nQuery = User::query();
 
-        $potentialUsers = User::find(array_diff($allUsers, $subjectUsers));
+        $data['term_adding'] = $data['term_adding'] ?? '';
+        $data['role_adding'] = $data['role_adding'] ?? '';
+
+        $nQuery->where(function ($query) use ($data) {
+            $query->where('surname', 'LIKE', '%'.$data['term_adding'].'%')
+                ->orWhere('email', 'LIKE', '%'.$data['term_adding'].'%')
+                ->orWhere('name', 'LIKE', '%'.$data['term_adding'].'%');
+        });
+
+        if ($data['role_adding'] !== '') 
+            $nQuery->where('role_id', $data['role_adding']);
+
+        
+
+        $allUsers = $nQuery->whereHas('role', function($query) use ($rolesWithTeacher){
+            $query->whereIn('id', $rolesWithTeacher);
+        })->get()->pluck('id')->toArray();
+
+        $subjectUsers = $subject->teachedBy->pluck('id')->toArray();
+        $potentialUsers = User::whereIn('id', array_diff($allUsers, $subjectUsers));
 
         $permissions = auth()->user()->role->permissions->pluck('name')->toArray();
 
@@ -89,7 +110,7 @@ class SubjectController extends Controller
         [
             'subject' => $subject,
             'users' => $mQuery->with(['role', 'teacherOf'])->paginate(10),
-            'potentialTeachers' => $potentialUsers,
+            'potentialTeachers' => $potentialUsers->with(['role'])->paginate(10, ['*'], 'ps_page'),
             'roles' => Role::all(),
             'params' => [
                 'page' => request()->input('page'),
@@ -154,21 +175,28 @@ class SubjectController extends Controller
 
         Validator::make($input, [
             'custom_name' => ['string', 'nullable', 'max:255', Rule::unique('subjects', 'name')->ignore($subject->id)],
-            'teacher' => ['required', 'numeric'],
+            'userIds' => ['required', 'array'],
+            'detaching' => ['required', 'boolean'],
         ])->validate();
 
-        $permArr = User::find($input['teacher'])->role()->with('permissions')->get()->pluck('permissions')->flatten()->pluck('name')->toArray();
+        foreach ($input['userIds'] as $user) {
+            if (User::find($user)->get()->count() === 0)
+                return redirect()->back()->withErrors([
+                    'userIds' => 'Neveljavni uporabnik med izbranimi.'
+                ]);
 
-        if (!in_array('teacher', $permArr))
-            return redirect()->back()->withErrors([
-                'teacher' => 'Uporabnik ne more biti učitelj.'
-            ]);
+            $permArr = User::find($user)->role()->with('permissions')->get()->pluck('permissions')->flatten()->pluck('name')->toArray();
+            if (!in_array('teacher', $permArr))
+                return redirect()->back()->withErrors([
+                    'teacher' => 'Uporabnik ne more biti učitelj.'
+                ]);
+        }
 
-        if ($subject->teachedBy()->find($input['teacher'])) {
-            $subject->teachedBy()->detach($input['teacher']);
+        if ($input['detaching']) {
+            $subject->teachedBy()->detach($input['userIds']);
             return;
         }
 
-        $subject->teachedBy()->sync([$input['teacher'] => ['custom_name' => $input['custom_name']]], false);
+        $subject->teachedBy()->syncWithPivotValues($input['userIds'], ['custom_name' => $input['custom_name']], false);
     }
 }

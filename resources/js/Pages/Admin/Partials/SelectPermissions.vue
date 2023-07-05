@@ -50,6 +50,9 @@ let form = ref({
     'subjects.create': false,
     'subjects.edit': false,
     'subjects.delete': false,
+    'timetable.edit': false,
+    'settings.edit': false,
+    'settings.view': false,
     ...inclds()
 });
 
@@ -122,6 +125,16 @@ const timetable = {
         ...inclds('timetable.edit')
     }
 }
+
+const settings = {
+    arr: [
+        { name: 'Pogled', id: 'settings.view'},
+        { name: 'Urejanje', id: 'settings.edit'},
+    ],
+    form: {
+        ...inclds('settings.edit', 'settings.view')
+    }
+}
 </script>
 
 <template>
@@ -178,6 +191,14 @@ const timetable = {
                     <tr class="bg-white hover:bg-gray-50">
                         <div class="m-2 text-xl">
                             <InlineCheckboxes :items="timetable.arr" :form="timetable.form" @formChange="updateForm"/>
+                        </div>
+                    </tr>
+                </table>
+                <h1 class="font-semibold text-gray-900 text-lg m-2">Ostalo</h1>
+                <table class="w-full">
+                    <tr class="bg-white hover:bg-gray-50">
+                        <div class="m-2 text-xl">
+                            <InlineCheckboxes :items="settings.arr" :form="settings.form" @formChange="updateForm"/>
                         </div>
                     </tr>
                 </table>
