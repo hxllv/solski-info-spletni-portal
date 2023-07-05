@@ -1,5 +1,5 @@
 <script setup>
-import AppLayout from '@/Layouts/AppLayout.vue';
+import DashboardLayout from '@/Layouts/DashboardLayout.vue';
 import Welcome from '@/Components/Welcome.vue';
 import Timetable from '@/Components/Timetable.vue';
 
@@ -13,7 +13,7 @@ defineProps({
 </script>
 
 <template>
-    <AppLayout title="Namizje" :permission="permission">
+    <DashboardLayout title="Namizje" :permission="permission">
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
@@ -21,5 +21,5 @@ defineProps({
                 </div>
             </div>
         </div>
-    </AppLayout>
+    </DashboardLayout>
 </template>
