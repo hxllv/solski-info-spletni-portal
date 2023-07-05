@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('password');
             $table->rememberToken();
             $table->boolean('is_account_owner');
+            $table->boolean('is_registered');
             $table->foreignId('current_team_id')->nullable();
             $table->foreignId('role_id');
             $table->foreignId('school_class_id')->nullable();

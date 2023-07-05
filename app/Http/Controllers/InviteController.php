@@ -29,7 +29,7 @@ class InviteController extends Controller
         $this->guard = $guard;
     }
     
-    public function send()
+    public function send(Request $request, CreatesNewUsers $creator)
     {
         $this->authorize('invite', User::class);
 
@@ -51,30 +51,24 @@ class InviteController extends Controller
                 'role' => 'Neveljavna skupina pravic.'
             ]);
 
-        if (!empty($data['class']) && $$data['class'] != -1 && SchoolClass::where('id', $data['class'])->get()->count() === 0)
+        if (!empty($data['class']) && $data['class'] != -1 && SchoolClass::where('id', $data['class'])->get()->count() === 0)
             return redirect()->back()->withErrors([
                 'class' => 'Neveljavni razred.'
             ]);
+
+        event(new Registered($creator->invite($request->all())));
 
         Notification::route('mail', $data['email'])->notify(new Invite($data));
     }
 
     public function store(Request $request, CreatesNewUsers $creator): RegisterResponse
     {
-        $email = $request->input('email');
-        $role = $request->input('role');
-        $class = $request->input('class');
+        $userId = $request->input('userId');
 
-        if (User::where('email', $email)->get()->count() !== 0)
-            abort(403, 'Email je že registriran.');
+        if (!User::find($userId))
+            abort(403, 'Prišlo je do napake.');
 
-        if (Role::where('id', $role)->get()->count() === 0)
-            abort(403, 'Neveljavna skupina pravic.');
-
-        if (!empty($class) && SchoolClass::where('id', $class)->get()->count() === 0)
-            abort(403, 'Neveljavni razred.');
-
-        event(new Registered($creator->invite($request->all())));
+        event(new Registered($creator->inviteFinal($request->all())));
 
         return app(RegisterResponse::class);
     }
@@ -86,16 +80,16 @@ class InviteController extends Controller
         $class = $request->input('class');
         $name = $request->input('name');
         $surname = $request->input('surname');
+        $userId = $request->input('userId');
 
-        if (User::where('email', $email)->get()->count() !== 0)
-            abort(403, 'Email is already registered.');
+        if (User::where('email', $email)->where('is_registered', true)->get()->count() !== 0)
+            abort(403, 'Email je že registriran.');
 
-        $url = URL::temporarySignedRoute('invited', now()->addMinutes(30), [
-            'role' => $role,
-            'class' => $class,
-            'email' => $email,
-            'name' => $name,
-            'surname' => $surname,
+        if (User::where('id', $userId)->get()->count() !== 1)
+            abort(403, 'Prišlo je do napake.');
+
+        $url = URL::temporarySignedRoute('invited', now()->addMinutes(10), [
+            'userId' => $userId,
         ]);
 
         return Inertia::render('Auth/Invite', 

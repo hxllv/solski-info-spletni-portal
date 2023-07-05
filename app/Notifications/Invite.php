@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -72,7 +73,10 @@ class Invite extends Notification
      */
     public function generateInvitationUrl()
     {
+        $userId = User::where('email', $this->data["email"])->first()->id;
+
         return URL::temporarySignedRoute('invited', now()->addDay(), [
+            'userId' => $userId,
             'role' => $this->data["role"],
             'class' => $this->data["class"],
             'email' => $this->data["email"],

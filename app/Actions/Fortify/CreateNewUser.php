@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
 use Laravel\Jetstream\Jetstream;
+use Illuminate\Support\Str;
 
 use function PHPUnit\Framework\isEmpty;
 
@@ -37,7 +38,8 @@ class CreateNewUser implements CreatesNewUsers
                 'surname' => $input['surname'],
                 'email' => $input['email'],
                 'password' => Hash::make($input['password']),
-                'is_account_owner' => true
+                'is_account_owner' => true,
+                'is_registered' => true,
             ]), function (User $user) {
                 return $user;
             });
@@ -55,7 +57,6 @@ class CreateNewUser implements CreatesNewUsers
             'name' => ['required', 'string', 'max:255'],
             'surname' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => $this->passwordRules(),
             'role' => ['required', 'numeric'],
             'class' => ['required', 'numeric'],
         ])->validate();
@@ -67,14 +68,28 @@ class CreateNewUser implements CreatesNewUsers
                 'name' => $input['name'],
                 'surname' => $input['surname'],
                 'email' => $input['email'],
-                'password' => Hash::make($input['password']),
-                'is_account_owner' => false
+                'password' => Hash::make(Str::uuid()->toString()),
+                'is_account_owner' => false,
+                'is_registered' => false,
             ]), function (User $user) use ($input) {
-                if (!empty($input['class']) && $$data['class'] != -1)
+                if (!empty($input['class']) && $input['class'] != -1)
                     $user->studentOf()->associate($input['class'])->save();
                 return $user;
             });
         });
+    }
+
+    public function inviteFinal(array $input): void
+    {
+        Validator::make($input, [
+            'password' => $this->passwordRules(),
+            'userId' => ['required', 'numeric'],
+        ])->validate();
+
+        User::find($input['userId'])->forceFill([
+            'password' => Hash::make($input['password']),
+            'is_registered' => true,
+        ])->save();
     }
 
     /**
