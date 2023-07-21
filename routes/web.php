@@ -8,7 +8,9 @@ use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TimetableEntryController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\GradebookController;
 use App\Models\Permission;
+use App\Models\SchoolClass;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -31,7 +33,6 @@ use Laravel\Fortify\Http\Controllers\TwoFactorQrCodeController;
 use Laravel\Fortify\Http\Controllers\TwoFactorSecretKeyController;
 use Laravel\Fortify\Http\Controllers\VerifyEmailController;
 use Laravel\Fortify\RoutePath;
-use Laravel\Jetstream\Jetstream;
 
 /*
 |--------------------------------------------------------------------------
@@ -55,6 +56,31 @@ Route::middleware([
 ])->group(function () {
     Route::prefix('dashboard')->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    });
+
+    Route::prefix('teacher')->group(function () {
+        Route::get('/', function () {
+            $data = request()->validate([
+                'classId' => 'numeric|nullable',
+            ]);
+
+            $data['classId'] = $data['classId'] ?? '';
+
+            $permissions = auth()->user()->role->permissions->pluck('name')->toArray();
+
+            if (auth()->user()->is_account_owner) 
+                $permissions = Permission::all()->pluck('name')->toArray();
+
+            return Inertia::render('Teacher/Initial', 
+                [
+                    'classId' => $data['classId'],
+                    'classes' => SchoolClass::all(),
+                    'permission' => $permissions,
+                ]
+            );
+        })->name('teacher');
+
+        Route::get('/gradebook', [GradebookController::class, 'index'])->name('gradebook');
     });
 
     Route::prefix('admin')->group(function () {
@@ -103,7 +129,7 @@ Route::middleware([
         Route::get('/settings', [SettingController::class, 'index'])->name('settings');
         Route::put('/settings/{setting}', [SettingController::class, 'update'])->name('setting.update');
 
-    });
+    })->name('admin');
 
 });
 

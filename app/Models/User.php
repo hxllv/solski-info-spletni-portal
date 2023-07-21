@@ -81,4 +81,8 @@ class User extends Authenticatable
     public function parentOf() {
         return $this->belongsToMany(User::class, 'parents', 'parent_id', 'child_id');
     }
+
+    public function grades() {
+        return $this->hasMany(Gradebook::class, 'user_id');
+    }
 }

@@ -23,5 +23,10 @@ class SubjectTeacher extends Model
     {
         return $this->hasMany(TimetableEntry::class, 'subject_teacher_id');
     }
+
+    public function grades()
+    {
+        return $this->hasMany(Gradebook::class, 'subject_teacher_id');
+    }
 }
 

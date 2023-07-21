@@ -31,7 +31,7 @@ const inclds = (...names) => {
 }
 
 let form = ref({
-    'teacher': false,
+    'teacher.panel.view': false,
     'class.teacher': false,
     'admin.panel.view': false,
     'users.view': false,
@@ -67,6 +67,42 @@ const updateForm = (newForm) => {
 
 const emitter = () => {
     emit('formChange', form.value)
+}
+
+const gradebook = {
+    arr: [
+        { name: 'Pogled', id: 'gradebook.view'},
+        { name: 'Vnos', id: 'gradebook.create'},
+        { name: 'Urejanje', id: 'gradebook.edit'},
+        { name: 'Brisanje', id: 'gradebook.delete'}
+    ],
+    form: {
+        ...inclds('gradebook.view', 'gradebook.create', 'gradebook.edit', 'gradebook.delete')
+    }
+}
+
+const missing = {
+    arr: [
+        { name: 'Pogled', id: 'missing.view'},
+        { name: 'Vnos', id: 'missing.create'},
+        { name: 'Urejanje', id: 'missing.edit'},
+        { name: 'Brisanje', id: 'missing.delete'}
+    ],
+    form: {
+        ...inclds('missing.view', 'missing.create', 'missing.edit', 'missing.delete')
+    }
+}
+
+const test = {
+    arr: [
+        { name: 'Pogled', id: 'test.view'},
+        { name: 'Vnos', id: 'test.create'},
+        { name: 'Urejanje', id: 'test.edit'},
+        { name: 'Brisanje', id: 'test.delete'}
+    ],
+    form: {
+        ...inclds('test.view', 'test.create', 'test.edit', 'test.delete')
+    }
 }
 
 const users = {
@@ -143,11 +179,77 @@ const settings = {
         <table class="w-full text-sm text-left text-gray-500">
             <tr class="bg-white hover:bg-gray-50">
                 <div class="m-2">
+                    <InputLabel for="teacher" textSize="text-base">
+                        <div class="flex items-center">
+                            <Checkbox class="p-2" id="teacher" v-model:checked="form['teacher.panel.view']" name="teacher" required @change="emitter"/>
+                            <div class="ml-2">
+                                Učiteljski panel
+                            </div>
+                        </div>
+                    </InputLabel>
+                </div>
+            </tr>
+            <div :class="[form['teacher.panel.view'] ? '' : 'pointer-events-none opacity-30']" class="border p-2 rounded-md shadow mb-3 ml-5">
+                <table class="w-full">
+                    <tr class="bg-white hover:bg-gray-50">
+                        <div class="m-2">
+                            <InputLabel for="class.teacher" textSize="text-base">
+                                <div class="flex items-center">
+                                    <Checkbox class="p-2" id="class.teacher" v-model:checked="form['class.teacher']" name="class.teacher" required @change="emitter"/>
+                                    <div class="ml-2">
+                                        Je lahko razrednik
+                                    </div>
+                                </div>
+                            </InputLabel>
+                        </div>
+                    </tr>
+                </table>
+                <table class="w-full">
+                    <tr class="bg-white hover:bg-gray-50">
+                        <div class="m-2">
+                            <InputLabel for="all.classes.view" textSize="text-base">
+                                <div class="flex items-center">
+                                    <Checkbox class="p-2" id="all.classes.view" v-model:checked="form['all.classes.view']" name="all.classes.view" required @change="emitter"/>
+                                    <div class="ml-2">
+                                        Vpogled za vse razrede
+                                    </div>
+                                </div>
+                            </InputLabel>
+                        </div>
+                    </tr>
+                </table>
+                <h1 class="font-semibold text-gray-900 text-lg m-2">Redovalnica</h1>
+                <table class="w-full">
+                    <tr class="bg-white hover:bg-gray-50">
+                        <div class="m-2 text-xl">
+                            <InlineCheckboxes :items="gradebook.arr" :form="gradebook.form" @formChange="updateForm"/>
+                        </div>
+                    </tr>
+                </table>
+                <h1 class="font-semibold text-gray-900 text-lg m-2">Izostanki</h1>
+                <table class="w-full">
+                    <tr class="bg-white hover:bg-gray-50">
+                        <div class="m-2 text-xl">
+                            <InlineCheckboxes :items="missing.arr" :form="missing.form" @formChange="updateForm"/>
+                        </div>
+                    </tr>
+                </table>
+                <h1 class="font-semibold text-gray-900 text-lg m-2">Datumi ocenjevanja</h1>
+                <table class="w-full">
+                    <tr class="bg-white hover:bg-gray-50">
+                        <div class="m-2 text-xl">
+                            <InlineCheckboxes :items="test.arr" :form="test.form" @formChange="updateForm"/>
+                        </div>
+                    </tr>
+                </table>
+            </div>
+            <tr class="bg-white hover:bg-gray-50">
+                <div class="m-2">
                     <InputLabel for="admin.panel.view" textSize="text-base">
                         <div class="flex items-center">
                             <Checkbox class="p-2" id="admin.panel.view" v-model:checked="form['admin.panel.view']" name="admin.panel.view" required @change="emitter"/>
                             <div class="ml-2">
-                                Admin panel
+                                Administratorski panel
                             </div>
                         </div>
                     </InputLabel>
@@ -203,30 +305,6 @@ const settings = {
                     </tr>
                 </table>
             </div>
-            <tr class="bg-white hover:bg-gray-50">
-                <div class="m-2">
-                    <InputLabel for="class.teacher" textSize="text-base">
-                        <div class="flex items-center">
-                            <Checkbox class="p-2" id="class.teacher" v-model:checked="form['class.teacher']" name="class.teacher" required @change="emitter"/>
-                            <div class="ml-2">
-                                Je lahko razrednik
-                            </div>
-                        </div>
-                    </InputLabel>
-                </div>
-            </tr>
-            <tr class="bg-white hover:bg-gray-50">
-                <div class="m-2">
-                    <InputLabel for="teacher" textSize="text-base">
-                        <div class="flex items-center">
-                            <Checkbox class="p-2" id="teacher" v-model:checked="form['teacher']" name="teacher" required @change="emitter"/>
-                            <div class="ml-2">
-                                Je lahko nosilec predmeta
-                            </div>
-                        </div>
-                    </InputLabel>
-                </div>
-            </tr>
         </table>
     </div>
 </template>

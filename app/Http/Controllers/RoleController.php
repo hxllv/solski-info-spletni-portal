@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 class RoleController extends Controller
 {
     readonly array $adminPanelSubPermissions;
+    readonly array $teacherPanelSubPermissions;
 
     public function __construct() {
         $this->adminPanelSubPermissions = [
@@ -26,7 +27,7 @@ class RoleController extends Controller
             'roles.edit',
             'roles.delete',
             'classes.view',
-            'classes.invite',
+            'classes.create',
             'classes.edit',
             'classes.delete',
             'subjects.view',
@@ -36,6 +37,21 @@ class RoleController extends Controller
             'timetable.edit',
             'settings.edit',
             'settings.view',
+        ];
+        $this->teacherPanelSubPermissions = [
+            'class.teacher',
+            'gradebook.view',
+            'gradebook.create',
+            'gradebook.edit',
+            'gradebook.delete',
+            'missing.view',
+            'missing.create',
+            'missing.edit',
+            'missing.delete',
+            'test.view',
+            'test.create',
+            'test.edit',
+            'test.delete',
         ];
     }
 
@@ -113,6 +129,10 @@ class RoleController extends Controller
         if (!$permissions['admin.panel.view']) {
             $role->permissions()->detach('admin.panel.view');
             $role->permissions()->detach($this->adminPanelSubPermissions);
+        }
+        if (!$permissions['teacher.panel.view']) {
+            $role->permissions()->detach('teacher.panel.view');
+            $role->permissions()->detach($this->teacherPanelSubPermissions);
         }
 
         $role->save();

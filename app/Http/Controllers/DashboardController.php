@@ -28,7 +28,7 @@ class DashboardController extends Controller
         if (auth()->user()->is_account_owner) 
             $permissions = Permission::all()->pluck('name')->toArray();
 
-        if (in_array('teacher', $permissions)) {
+        if (in_array('teacher.panel.view', $permissions)) {
             $teacherOfPivot = auth()->user()->teacherOfPivot->pluck('id')->toArray();
             $timetableEntries = TimetableEntry::whereIn('subject_teacher_id', $teacherOfPivot)->with(['subject_teacher', 'school_class'])->get();
         }

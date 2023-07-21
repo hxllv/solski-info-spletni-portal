@@ -77,7 +77,7 @@ class SubjectController extends Controller
 
         // not a great way to find users 
 
-        $rolesWithTeacher = Permission::find('teacher')->roles->pluck('id')->toArray();
+        $rolesWithTeacher = Permission::find('teacher.panel.view')->roles->pluck('id')->toArray();
         $nQuery = User::query();
 
         $data['term_adding'] = $data['term_adding'] ?? '';
@@ -186,7 +186,7 @@ class SubjectController extends Controller
                 ]);
 
             $permArr = User::find($user)->role()->with('permissions')->get()->pluck('permissions')->flatten()->pluck('name')->toArray();
-            if (!in_array('teacher', $permArr))
+            if (!in_array('teacher.panel.view', $permArr))
                 return redirect()->back()->withErrors([
                     'teacher' => 'Uporabnik ne more biti učitelj.'
                 ]);

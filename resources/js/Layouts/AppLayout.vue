@@ -73,7 +73,15 @@ const adminRoute = ref(getAdminRoute());
                                     route().current('view.subject') ||
                                     route().current('view.class')
                                 ">
-                                    Admin
+                                    Admini
+                                </NavLink>
+                            </div>
+
+                            <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex" v-if="permission.includes('teacher.panel.view')">
+                                <NavLink :href="route('teacher')" :active="
+                                    route().current('teacher')
+                                ">
+                                    Učitelji
                                 </NavLink>
                             </div>
                         </div>

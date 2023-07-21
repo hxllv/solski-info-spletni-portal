@@ -192,7 +192,6 @@ const usersModAdding = computed(() => {
                             v-model="formFilter.role"
                             class="mt-1 block w-full"
                             autocomplete="role"
-                            :defaultValue="''"
                         >
                             <option value="">Vsi</option>
                             <option v-for="role in roles" :value="role.id">{{role.name}}</option>
