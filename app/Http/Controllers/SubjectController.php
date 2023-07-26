@@ -92,8 +92,6 @@ class SubjectController extends Controller
         if ($data['role_adding'] !== '') 
             $nQuery->where('role_id', $data['role_adding']);
 
-        
-
         $allUsers = $nQuery->whereHas('role', function($query) use ($rolesWithTeacher){
             $query->whereIn('id', $rolesWithTeacher);
         })->get()->pluck('id')->toArray();
@@ -105,6 +103,8 @@ class SubjectController extends Controller
 
         if (auth()->user()->is_account_owner) 
             $permissions = Permission::all()->pluck('name')->toArray();
+
+        //dd($mQuery->with(['teacherOf'])->get());
 
         return Inertia::render('Admin/Subject', 
         [

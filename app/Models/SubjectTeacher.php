@@ -9,6 +9,21 @@ class SubjectTeacher extends Model
 {
     use HasFactory;
 
+    protected $appends = [
+        'name', 'users_full_name'
+    ];
+
+    public function getNameAttribute()
+    {
+        return $this->custom_name ? $this->custom_name : $this->subject->name;
+    }
+
+    public function getUsersFullNameAttribute()
+    {
+        return $this->user->full_name;
+    }
+
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -27,6 +42,16 @@ class SubjectTeacher extends Model
     public function grades()
     {
         return $this->hasMany(Gradebook::class, 'subject_teacher_id');
+    }
+
+    public function absences()
+    {
+        return $this->hasMany(Absence::class, 'subject_teacher_id');
+    }
+
+    public function tests()
+    {
+        return $this->hasMany(Test::class, 'subject_teacher_id');
     }
 }
 

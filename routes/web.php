@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AbsenceController;
 use App\Http\Controllers\InviteController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
@@ -9,6 +10,7 @@ use App\Http\Controllers\TimetableEntryController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GradebookController;
+use App\Http\Controllers\TestController;
 use App\Models\Permission;
 use App\Models\SchoolClass;
 use Illuminate\Foundation\Application;
@@ -81,6 +83,20 @@ Route::middleware([
         })->name('teacher');
 
         Route::get('/gradebook', [GradebookController::class, 'index'])->name('gradebook');
+        Route::post('/gradebook', [GradebookController::class, 'store'])->name('create.gradebook');
+        Route::delete('/gradebook/{grade}', [GradebookController::class, 'destroy'])->name('gradebook.delete');
+        Route::put('/gradebook/{grade}', [GradebookController::class, 'update'])->name('gradebook.update');
+
+        Route::get('/absences', [AbsenceController::class, 'index'])->name('absences');
+        Route::post('/absences', [AbsenceController::class, 'store'])->name('create.absences');
+        Route::delete('/absences/{absence}', [AbsenceController::class, 'destroy'])->name('absences.delete');
+        Route::put('/absences/approval/{absence}', [AbsenceController::class, 'approval'])->name('absences.approval');
+        Route::put('/absences/excuse/{absence}', [AbsenceController::class, 'excuse'])->name('absences.excuse');
+
+        Route::get('/tests', [TestController::class, 'index'])->name('tests');
+        Route::post('/tests', [TestController::class, 'store'])->name('create.tests');
+        Route::delete('/tests/{test}', [TestController::class, 'destroy'])->name('tests.delete');
+        Route::put('/tests/{test}', [TestController::class, 'update'])->name('tests.update');
     });
 
     Route::prefix('admin')->group(function () {

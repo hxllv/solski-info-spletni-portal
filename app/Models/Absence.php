@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class TimetableEntry extends Model
+class Absence extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'day', 'hour'
+        'date', 'hour', 'excuse', 'status', 'subject_teacher_id', 'user_id'
     ];
 
     protected $appends = [
@@ -33,8 +33,8 @@ class TimetableEntry extends Model
         return $this->belongsTo(SubjectTeacher::class, 'subject_teacher_id');
     }
 
-    public function school_class()
+    public function user()
     {
-        return $this->belongsTo(SchoolClass::class, 'school_class_id');
+        return $this->belongsTo(User::class);
     }
 }

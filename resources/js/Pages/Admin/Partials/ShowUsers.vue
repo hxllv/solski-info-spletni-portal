@@ -142,30 +142,6 @@ const multiActionDo = (modalName) => {
         });
     }
 };
-
-// preuredi podatke v users array objectih
-
-const hatedProps = ['created_at', 'current_team_id', 'email_verified_at', 'role_id', 'name', 'surname', 'two_factor_confirmed_at', 'updated_at'];
-
-const usersMod = computed(() => {
-    let newUsers = JSON.parse(JSON.stringify(props.users));
-
-    newUsers.data.forEach(user => {
-        user.fullname = `${user.name} ${user.surname}`
-        if (!user.is_registered)
-            user.fullname += ' (neregistriran)'
-        user.role = user.is_account_owner ? 'Glavni administrator' : user.role.name
-        user.class = user.student_of ? user.student_of.name : '/'
-
-        hatedProps.forEach(prop => {
-            delete user[prop]
-        })
-    })
-
-    return newUsers
-});
-
-console.log(props.users)
 </script>
 
 <template>
@@ -244,8 +220,8 @@ console.log(props.users)
         </div>
     </div>
     
-    <Table :data="usersMod" :headerNames="['Ime', 'Email', 'Razred', 'Skupina pravic']" 
-        :sortedAs="['fullname', 'email', 'class', 'role']" 
+    <Table :data="users" :headerNames="['Ime', 'Email', 'Razred', 'Skupina pravic']" 
+        :sortedAs="['full_name', 'email', 'class_name', 'role_name']" 
         :allowEdit="permission.includes('users.edit')" :allowDelete="permission.includes('users.delete')" 
         :allowMultiActions="true"
         @edit="openEditModal" 

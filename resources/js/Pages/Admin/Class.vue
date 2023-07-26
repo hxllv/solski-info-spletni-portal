@@ -1,6 +1,6 @@
 <script setup>
 import { useForm, Link, router } from '@inertiajs/vue3';
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import Table from '@/Components/Table.vue';
 import InputLabel from '@/Components/InputLabel.vue';
@@ -125,45 +125,6 @@ const refresh = () => {
         }
     )
 }
-
-// modifying users
-
-const hatedProps = ['created_at', 'current_team_id', 'email_verified_at', 'role_id', 'name', 'surname', 'two_factor_confirmed_at', 'updated_at'];
-
-const usersMod = computed(() => {
-    let newUsers = JSON.parse(JSON.stringify(props.students));
-
-    newUsers.data.forEach(user => {
-        user.fullname = `${user.name} ${user.surname}`
-        if (!user.is_registered)
-            user.fullname += ' (neregistriran)'
-        user.role = user.role.name
-
-        hatedProps.forEach(prop => {
-            delete user[prop]
-        })
-    })
-
-    return newUsers
-});
-
-const usersModAdding = computed(() => {
-    let newUsers = JSON.parse(JSON.stringify(props.potentialStudents));
-
-    newUsers.data.forEach(user => {
-        user.fullname = `${user.name} ${user.surname}`
-        if (!user.is_registered)
-            user.fullname += ' (neregistriran)'
-        user.role = user.role.name
-        user.class = user.student_of ? user.student_of.name : '/'
-
-        hatedProps.forEach(prop => {
-            delete user[prop]
-        })
-    })
-
-    return newUsers
-});
 </script>
 
 <template>
@@ -225,8 +186,8 @@ const usersModAdding = computed(() => {
                     </div>
                 </div>
 
-                <Table :data="usersMod" :headerNames="['Ime', 'Email', 'Skupina pravic']" 
-                    :sortedAs="['fullname', 'email', 'role']" 
+                <Table :data="students" :headerNames="['Ime', 'Email', 'Skupina pravic']" 
+                    :sortedAs="['full_name', 'email', 'role_name']" 
                     :allowEdit="false" :allowDelete="false" :allowMultiActions="permission.includes('classes.edit')"
                     :query="{ term: formFilter.term, role: formFilter.role }"
                     :buffer="layout.buffer"
@@ -282,8 +243,8 @@ const usersModAdding = computed(() => {
                                 </Link>
                             </div>
                         </div>
-                        <Table :data="usersModAdding" :headerNames="['Ime', 'Email', 'Skupina pravic', 'Razred']" 
-                            :sortedAs="['fullname', 'email', 'role', 'class']" 
+                        <Table :data="potentialStudents" :headerNames="['Ime', 'Email', 'Skupina pravic', 'Razred']" 
+                            :sortedAs="['full_name', 'email', 'role_name', 'class']" 
                             :allowEdit="false" :allowDelete="false" :allowMultiActions="true"
                             :query="{ page: props.params.page, term: formFilter.term, role: formFilter.role, term_adding: formFilterAdding.term_adding, role_adding: formFilterAdding.role_adding }"
                             :buffer="layout.buffer"

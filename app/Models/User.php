@@ -50,6 +50,28 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    protected $appends = [
+        'full_name', 'role_name', 'class_name'
+    ];
+
+    public function getFullNameAttribute()
+    {
+        if (!$this->is_registered) 
+            return "$this->name $this->surname (neregistriran)";
+
+        return "$this->name $this->surname";
+    }
+
+    public function getRoleNameAttribute()
+    {
+        return $this->role->name;
+    }
+
+    public function getClassNameAttribute()
+    {
+        return $this->studentOf ? $this->studentOf->name : null;
+    }
+
     public function role()
     {
         return $this->belongsTo(Role::class);
@@ -67,7 +89,7 @@ class User extends Authenticatable
 
     public function teacherOf()
     {
-        return $this->belongsToMany(Subject::class, 'subject_teachers', 'user_id')->withPivot('custom_name')->withTimestamps();
+        return $this->belongsToMany(Subject::class, 'subject_teachers', 'user_id')->withPivot(['custom_name', 'id'])->withTimestamps();
     }
 
     public function teacherOfPivot() {
@@ -84,5 +106,9 @@ class User extends Authenticatable
 
     public function grades() {
         return $this->hasMany(Gradebook::class, 'user_id');
+    }
+
+    public function absences() {
+        return $this->hasMany(Absence::class, 'user_id');
     }
 }

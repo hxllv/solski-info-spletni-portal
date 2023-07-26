@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('gradebooks', function (Blueprint $table) {
+        Schema::create('absences', function (Blueprint $table) {
             $table->id();
-            $table->integer('grade');
-            $table->string('note')->nullable();
+            $table->date('date');
+            $table->decimal('hour', 8, 1);
+            $table->string('excuse')->nullable();
+            $table->integer('status');
             $table->foreignId('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreignId('subject_teacher_id')->references('id')->on('subject_teachers')->onDelete('cascade');
             $table->timestamps();
@@ -26,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('gradebooks');
+        Schema::dropIfExists('absences');
     }
 };

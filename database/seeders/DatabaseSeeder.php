@@ -44,19 +44,20 @@ class DatabaseSeeder extends Seeder
             ['name' => 'gradebook.create'],
             ['name' => 'gradebook.edit'],
             ['name' => 'gradebook.delete'],
-            ['name' => 'missing.view'],
-            ['name' => 'missing.create'],
-            ['name' => 'missing.delete'],
-            ['name' => 'test.view'],
-            ['name' => 'test.create'],
-            ['name' => 'test.edit'],
-            ['name' => 'test.delete'],
+            ['name' => 'absences.view'],
+            ['name' => 'absences.create'],
+            ['name' => 'absences.delete'],
+            ['name' => 'tests.view'],
+            ['name' => 'tests.create'],
+            ['name' => 'tests.edit'],
+            ['name' => 'tests.delete'],
         ]);
         \App\Models\Permission::factory()->hasAttached([$admin, $classTeacher])->createMany([
             ['name' => 'class.teacher'],
             ['name' => 'users.invite'],
             ['name' => 'roles.view'],
-            ['name' => 'missing.edit'],
+            ['name' => 'absences.edit'],
+            ['name' => 'absences.approval'],
         ]);
         \App\Models\Permission::factory()->hasAttached($admin)->createMany([
             ['name' => 'all.classes.view'],
@@ -74,6 +75,9 @@ class DatabaseSeeder extends Seeder
             ['name' => 'timetable.edit'],
             ['name' => 'settings.edit'],
             ['name' => 'settings.view'],
+            ['name' => 'gradebook.bypass'],
+            ['name' => 'absences.bypass'],
+            ['name' => 'tests.bypass'],
         ]);
 
         $adminUser = \App\Models\User::factory()->for($admin)->create([
@@ -82,42 +86,189 @@ class DatabaseSeeder extends Seeder
             'email' => 'nace.tavcer20@gmail.com',
         ]);
 
-        $class = \App\Models\SchoolClass::factory()->for($adminUser, 'classTeacher')->create([
-            'name' => 'R1a',
-        ]);
-
-        for ($i=2; $i < 100; $i++) { 
-            \App\Models\SchoolClass::factory()->for($adminUser, 'classTeacher')->create([
-                'name' => "R$i",
-            ]);
-        }
-
-        $subject = \App\Models\Subject::factory()->hasAttached($adminUser, [], 'teachedBy')->create([
-            'name' => 'Matematika',
-        ]);
-
-        \App\Models\User::factory()->for($teacher)->create([
-            'name' => 'NaceT',
-            'surname' => 'TavcerT',
+        $t1 = \App\Models\User::factory()->for($teacher)->create([
+            'name' => 'Luka',
+            'surname' => 'Tavcer',
             'email' => 'nace.tavcer@gmail.com',
             'is_account_owner' => false
         ]);
 
-        \App\Models\User::factory()->for($teacher)->create([
-            'name' => 'NaceT1',
-            'surname' => 'TavcerT1',
+        $t2 = \App\Models\User::factory()->for($teacher)->create([
+            'name' => 'Janez',
+            'surname' => 'Tavcer',
             'email' => 'nace.tavcer+t@gmail.com',
             'is_account_owner' => false
         ]);
 
-        $studentUser = \App\Models\User::factory()->for($student)->create([
-            'name' => 'NaceS',
-            'surname' => 'TavcerS',
-            'email' => 'nace.tavcer+s@gmail.com',
-            'is_account_owner' => false
+        $studentUsers = \App\Models\User::factory()->for($student)->createMany([
+            [
+                'email' => 'nace.tavcer+s@gmail.com',
+                'is_account_owner' => false
+            ],
+            ['is_account_owner' => false],
+            ['is_account_owner' => false],
+            ['is_account_owner' => false],
+            ['is_account_owner' => false],
+            ['is_account_owner' => false],
+            ['is_account_owner' => false],
+            ['is_account_owner' => false],
         ]);
 
-        $studentUser->studentOf()->associate($class)->save();
+        $class = \App\Models\SchoolClass::factory()->for($adminUser, 'classTeacher')->create([
+            'name' => 'R1a',
+        ]);
+
+        foreach ($studentUsers as $student) {
+            $student->studentOf()->associate($class)->save();
+        }
+
+        $math = \App\Models\Subject::factory()->hasAttached($adminUser, [], 'teachedBy')->create([
+            'name' => 'Matematika',
+        ]);
+
+        $eng = \App\Models\Subject::factory()->hasAttached([$adminUser, $t1], [], 'teachedBy')->create([
+            'name' => 'Angleščina',
+        ]);
+
+        $slo = \App\Models\Subject::factory()->hasAttached([$t1, $t2], [], 'teachedBy')->create([
+            'name' => 'Slovenščina',
+        ]);
+
+        $spo = \App\Models\Subject::factory()->hasAttached([$t1, $t2, $adminUser], [], 'teachedBy')->create([
+            'name' => 'Športna',
+        ]);
+
+        $mathPivot = $math->teachedBy->pluck('pivot');
+        $engPivot = $eng->teachedBy->pluck('pivot');
+        $sloPivot = $slo->teachedBy->pluck('pivot');
+        $spoPivot = $spo->teachedBy->pluck('pivot');
+
+        \App\Models\TimetableEntry::factory()->createMany([
+            [
+                'day' => 0,
+                'hour' => 0,
+                'subject_teacher_id' => $mathPivot[0]->id,
+                'school_class_id' => $class->id
+            ],
+            [
+                'day' => 0,
+                'hour' => 1,
+                'subject_teacher_id' => $engPivot[0]->id,
+                'school_class_id' => $class->id
+            ],
+            [
+                'day' => 0,
+                'hour' => 2,
+                'subject_teacher_id' => $sloPivot[0]->id,
+                'school_class_id' => $class->id
+            ],
+            [
+                'day' => 0,
+                'hour' => 3,
+                'subject_teacher_id' => $spoPivot[0]->id,
+                'school_class_id' => $class->id
+            ],
+            // torek
+            [
+                'day' => 1,
+                'hour' => 0,
+                'subject_teacher_id' => $mathPivot[0]->id,
+                'school_class_id' => $class->id
+            ],
+            [
+                'day' => 1,
+                'hour' => 1,
+                'subject_teacher_id' => $engPivot[1]->id,
+                'school_class_id' => $class->id
+            ],
+            [
+                'day' => 1,
+                'hour' => 2,
+                'subject_teacher_id' => $sloPivot[1]->id,
+                'school_class_id' => $class->id
+            ],
+            [
+                'day' => 1,
+                'hour' => 3,
+                'subject_teacher_id' => $spoPivot[1]->id,
+                'school_class_id' => $class->id
+            ],
+            // sreda
+            [
+                'day' => 2,
+                'hour' => 0,
+                'subject_teacher_id' => $mathPivot[0]->id,
+                'school_class_id' => $class->id
+            ],
+            [
+                'day' => 2,
+                'hour' => 1,
+                'subject_teacher_id' => $engPivot[0]->id,
+                'school_class_id' => $class->id
+            ],
+            [
+                'day' => 2,
+                'hour' => 2,
+                'subject_teacher_id' => $sloPivot[0]->id,
+                'school_class_id' => $class->id
+            ],
+            [
+                'day' => 2,
+                'hour' => 3,
+                'subject_teacher_id' => $spoPivot[2]->id,
+                'school_class_id' => $class->id
+            ],
+            // cetrtek
+            [
+                'day' => 3,
+                'hour' => 0,
+                'subject_teacher_id' => $mathPivot[0]->id,
+                'school_class_id' => $class->id
+            ],
+            [
+                'day' => 3,
+                'hour' => 1,
+                'subject_teacher_id' => $engPivot[1]->id,
+                'school_class_id' => $class->id
+            ],
+            [
+                'day' => 3,
+                'hour' => 2,
+                'subject_teacher_id' => $sloPivot[1]->id,
+                'school_class_id' => $class->id
+            ],
+            [
+                'day' => 3,
+                'hour' => 3,
+                'subject_teacher_id' => $spoPivot[0]->id,
+                'school_class_id' => $class->id
+            ],
+            // petek
+            [
+                'day' => 4,
+                'hour' => 0,
+                'subject_teacher_id' => $mathPivot[0]->id,
+                'school_class_id' => $class->id
+            ],
+            [
+                'day' => 4,
+                'hour' => 1,
+                'subject_teacher_id' => $engPivot[0]->id,
+                'school_class_id' => $class->id
+            ],
+            [
+                'day' => 4,
+                'hour' => 2,
+                'subject_teacher_id' => $sloPivot[0]->id,
+                'school_class_id' => $class->id
+            ],
+            [
+                'day' => 4,
+                'hour' => 3,
+                'subject_teacher_id' => $spoPivot[1]->id,
+                'school_class_id' => $class->id
+            ],
+        ]);
 
         \App\Models\Setting::factory()->create([
             'name' => 'timetable.hours',

@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Gradebook extends Model
+class Test extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'grade', 'note', 'subject_teacher_id'
+        'date', 'note', 'subject_teacher_id'
     ];
 
     public function subject_teacher()
@@ -18,8 +18,8 @@ class Gradebook extends Model
         return $this->belongsTo(SubjectTeacher::class, 'subject_teacher_id');
     }
 
-    public function user()
+    public function class()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(SchoolClass::class, 'school_class_id');
     }
 }

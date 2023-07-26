@@ -106,46 +106,6 @@ const dissociateUsers = () => {
         preserveScroll: true,
     });
 };
-
-// modifying users
-
-const hatedProps = ['created_at', 'current_team_id', 'email_verified_at', 'role_id', 'name', 'surname', 'two_factor_confirmed_at', 'updated_at'];
-
-const usersMod = computed(() => {
-    let newUsers = JSON.parse(JSON.stringify(props.children));
-
-    newUsers.data.forEach(user => {
-        user.fullname = `${user.name} ${user.surname}`
-        if (!user.is_registered)
-            user.fullname += ' (neregistriran)'
-        user.role = user.role.name
-
-        hatedProps.forEach(prop => {
-            delete user[prop]
-        })
-    })
-
-    return newUsers
-});
-
-const usersModAdding = computed(() => {
-    let newUsers = JSON.parse(JSON.stringify(props.potentialChildren));
-
-    newUsers.data.forEach(user => {
-        user.fullname = `${user.name} ${user.surname}`
-        if (!user.is_registered)
-            user.fullname += ' (neregistriran)'
-        user.role = user.role.name
-
-        hatedProps.forEach(prop => {
-            delete user[prop]
-        })
-    })
-
-    return newUsers
-});
-
-console.log(props.potentialChildren)
 </script>
 
 <template>
@@ -212,8 +172,8 @@ console.log(props.potentialChildren)
                     </div>
                 </div>
 
-                <Table :data="usersMod" :headerNames="['Ime', 'Email', 'Skupina pravic']" 
-                    :sortedAs="['fullname', 'email', 'role']" 
+                <Table :data="children" :headerNames="['Ime', 'Email', 'Skupina pravic']" 
+                    :sortedAs="['full_name', 'email', 'role_name']" 
                     :allowEdit="false" :allowDelete="false" :allowMultiActions="permission.includes('users.edit')"
                     :query="{ term: formFilter.term, role: formFilter.role }"
                     :buffer="layout.buffer"
@@ -267,8 +227,8 @@ console.log(props.potentialChildren)
                                 </Link>
                             </div>
                         </div>
-                        <Table :data="usersModAdding" :headerNames="['Ime', 'Email', 'Skupina pravic']" 
-                            :sortedAs="['fullname', 'email', 'role']" 
+                        <Table :data="potentialChildren" :headerNames="['Ime', 'Email', 'Skupina pravic']" 
+                            :sortedAs="['full_name', 'email', 'role_name']" 
                             :allowEdit="false" :allowDelete="false" :allowMultiActions="true"
                             :query="{ page: props.params.page, term: formFilter.term, role: formFilter.role, term_adding: formFilterAdding.term_adding, role_adding: formFilterAdding.role_adding }"
                             :buffer="layout.buffer"

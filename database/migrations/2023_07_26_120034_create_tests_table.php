@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('gradebooks', function (Blueprint $table) {
+        Schema::create('tests', function (Blueprint $table) {
             $table->id();
-            $table->integer('grade');
+            $table->date('date');
             $table->string('note')->nullable();
-            $table->foreignId('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreignId('school_class_id')->references('id')->on('school_classes')->onDelete('cascade');
             $table->foreignId('subject_teacher_id')->references('id')->on('subject_teachers')->onDelete('cascade');
             $table->timestamps();
         });
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('gradebooks');
+        Schema::dropIfExists('tests');
     }
 };

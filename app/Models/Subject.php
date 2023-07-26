@@ -15,6 +15,6 @@ class Subject extends Model
 
     public function teachedBy()
     {
-        return $this->belongsToMany(User::class, 'subject_teachers', 'subject_id')->withPivot('custom_name')->withTimestamps();
+        return $this->belongsToMany(User::class, 'subject_teachers', 'subject_id')->withPivot(['custom_name', 'id'])->withTimestamps();
     }
 }
