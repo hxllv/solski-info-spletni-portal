@@ -31,27 +31,8 @@ const inclds = (...names) => {
 
 let form = ref({
     "teacher.panel.view": false,
-    "class.teacher": false,
     "admin.panel.view": false,
-    "users.view": false,
-    "users.invite": false,
-    "users.edit": false,
-    "users.delete": false,
-    "roles.view": false,
-    "roles.create": false,
-    "roles.edit": false,
-    "roles.delete": false,
-    "classes.view": false,
-    "classes.create": false,
-    "classes.edit": false,
-    "classes.delete": false,
-    "subjects.view": false,
-    "subjects.create": false,
-    "subjects.edit": false,
-    "subjects.delete": false,
-    "timetable.edit": false,
-    "settings.edit": false,
-    "settings.view": false,
+    "dashboard.view": false,
     ...inclds(),
 });
 
@@ -67,6 +48,34 @@ const updateForm = (newForm) => {
 const emitter = () => {
     emit("formChange", form.value);
 };
+
+// dashboard
+
+const timetableDash = {
+    arr: [{ name: "Pogled", id: "dashboard.timetable.view" }],
+    form: {
+        ...inclds("dashboard.timetable.view"),
+    },
+};
+
+const absencesDash = {
+    arr: [
+        { name: "Pogled", id: "dashboard.absences.view" },
+        { name: "Opravičila", id: "dashboard.absences.edit" },
+    ],
+    form: {
+        ...inclds("dashboard.absences.view", "dashboard.absences.edit"),
+    },
+};
+
+const gradebookDash = {
+    arr: [{ name: "Pogled", id: "dashboard.gradebook.view" }],
+    form: {
+        ...inclds("dashboard.gradebook.view"),
+    },
+};
+
+// teacher panel
 
 const gradebook = {
     arr: [
@@ -117,11 +126,16 @@ const absencesExtra = {
 };
 
 const absencesExtra1 = {
-    arr: [
-        { name: "Brez omejitve predmetov in razredov", id: "absences.bypass" },
-    ],
+    arr: [{ name: "Brez omejitve predmetov", id: "absences.bypass.subject" }],
     form: {
-        ...inclds("absences.bypass"),
+        ...inclds("absences.bypass.subject"),
+    },
+};
+
+const absencesExtra2 = {
+    arr: [{ name: "Brez omejitve razredov", id: "absences.bypass.class" }],
+    form: {
+        ...inclds("absences.bypass.class"),
     },
 };
 
@@ -143,6 +157,37 @@ const testsExtra = {
         ...inclds("tests.bypass"),
     },
 };
+
+const overrides = {
+    arr: [
+        { name: "Pogled", id: "timetable.override.view" },
+        { name: "Vnos", id: "timetable.override.create" },
+        { name: "Urejanje", id: "timetable.override.edit" },
+        { name: "Brisanje", id: "timetable.override.delete" },
+    ],
+    form: {
+        ...inclds(
+            "timetable.override.view",
+            "timetable.override.create",
+            "timetable.override.edit",
+            "timetable.override.delete"
+        ),
+    },
+};
+
+const overridesExtra = {
+    arr: [
+        {
+            name: "Brez omejitve razredov",
+            id: "timetable.override.bypass",
+        },
+    ],
+    form: {
+        ...inclds("timetable.override.bypass"),
+    },
+};
+
+// admin panel
 
 const users = {
     arr: [
@@ -224,6 +269,144 @@ const settings = {
     <div class="col-span-6 sm:col-span-4">
         <h1 class="mb-4 font-semibold text-gray-900 text-xl">Pravice</h1>
         <table class="w-full text-sm text-left text-gray-500">
+            <tr class="bg-white hover:bg-gray-50">
+                <div class="m-2">
+                    <InputLabel for="dashboard" textSize="text-base">
+                        <div class="flex items-center">
+                            <Checkbox
+                                class="p-2"
+                                id="dashboard"
+                                v-model:checked="form['dashboard.view']"
+                                name="dashboard"
+                                required
+                                @change="emitter"
+                            />
+                            <div class="ml-2">Namizje</div>
+                        </div>
+                    </InputLabel>
+                </div>
+            </tr>
+            <div
+                :class="[
+                    form['dashboard.view']
+                        ? ''
+                        : 'pointer-events-none opacity-30',
+                ]"
+                class="border p-2 rounded-md shadow mb-3 ml-5"
+            >
+                <table class="w-full">
+                    <tr class="bg-white hover:bg-gray-50">
+                        <div class="m-2">
+                            <InputLabel
+                                for="dashboard.me.view"
+                                textSize="text-base"
+                            >
+                                <div class="flex items-center">
+                                    <Checkbox
+                                        class="p-2"
+                                        id="dashboard.me.view"
+                                        v-model:checked="
+                                            form['dashboard.me.view']
+                                        "
+                                        name="dashboard.me.view"
+                                        required
+                                        @change="emitter"
+                                    />
+                                    <div class="ml-2">Vpogled zase</div>
+                                </div>
+                            </InputLabel>
+                        </div>
+                    </tr>
+                </table>
+                <table class="w-full">
+                    <tr class="bg-white hover:bg-gray-50">
+                        <div class="m-2">
+                            <InputLabel
+                                for="dashboard.children.view"
+                                textSize="text-base"
+                            >
+                                <div class="flex items-center">
+                                    <Checkbox
+                                        class="p-2"
+                                        id="dashboard.children.view"
+                                        v-model:checked="
+                                            form['dashboard.children.view']
+                                        "
+                                        name="dashboard.children.view"
+                                        required
+                                        @change="emitter"
+                                    />
+                                    <div class="ml-2">Vpogled za otroke</div>
+                                </div>
+                            </InputLabel>
+                        </div>
+                    </tr>
+                </table>
+                <table class="w-full">
+                    <tr class="bg-white hover:bg-gray-50">
+                        <div class="m-2">
+                            <InputLabel
+                                for="dashboard.all.view"
+                                textSize="text-base"
+                            >
+                                <div class="flex items-center">
+                                    <Checkbox
+                                        class="p-2"
+                                        id="dashboard.all.view"
+                                        v-model:checked="
+                                            form['dashboard.all.view']
+                                        "
+                                        name="dashboard.all.view"
+                                        required
+                                        @change="emitter"
+                                    />
+                                    <div class="ml-2">Vpogled za vse</div>
+                                </div>
+                            </InputLabel>
+                        </div>
+                    </tr>
+                </table>
+                <h1 class="font-semibold text-gray-900 text-lg m-2">Urnik</h1>
+                <table class="w-full">
+                    <tr class="bg-white hover:bg-gray-50">
+                        <div class="m-2 text-xl">
+                            <InlineCheckboxes
+                                :items="timetableDash.arr"
+                                :form="timetableDash.form"
+                                @formChange="updateForm"
+                            />
+                        </div>
+                    </tr>
+                </table>
+                <h1 class="font-semibold text-gray-900 text-lg m-2">
+                    Redovalnica
+                </h1>
+                <table class="w-full">
+                    <tr class="bg-white hover:bg-gray-50">
+                        <div class="m-2 text-xl">
+                            <InlineCheckboxes
+                                :items="gradebookDash.arr"
+                                :form="gradebookDash.form"
+                                @formChange="updateForm"
+                            />
+                        </div>
+                    </tr>
+                </table>
+                <h1 class="font-semibold text-gray-900 text-lg m-2">
+                    Izostanki
+                </h1>
+                <table class="w-full">
+                    <tr class="bg-white hover:bg-gray-50">
+                        <div class="m-2 text-xl">
+                            <InlineCheckboxes
+                                :items="absencesDash.arr"
+                                :form="absencesDash.form"
+                                @formChange="updateForm"
+                            />
+                        </div>
+                    </tr>
+                </table>
+            </div>
             <tr class="bg-white hover:bg-gray-50">
                 <div class="m-2">
                     <InputLabel for="teacher" textSize="text-base">
@@ -325,6 +508,15 @@ const settings = {
                             />
                         </div>
                     </tr>
+                    <tr class="bg-white hover:bg-gray-50">
+                        <div class="m-2 text-xl">
+                            <InlineCheckboxes
+                                :items="absencesExtra2.arr"
+                                :form="absencesExtra2.form"
+                                @formChange="updateForm"
+                            />
+                        </div>
+                    </tr>
                 </table>
                 <h1 class="font-semibold text-gray-900 text-lg m-2">
                     Datumi ocenjevanja
@@ -344,6 +536,29 @@ const settings = {
                             <InlineCheckboxes
                                 :items="testsExtra.arr"
                                 :form="testsExtra.form"
+                                @formChange="updateForm"
+                            />
+                        </div>
+                    </tr>
+                </table>
+                <h1 class="font-semibold text-gray-900 text-lg m-2">
+                    Nadomeščanja
+                </h1>
+                <table class="w-full">
+                    <tr class="bg-white hover:bg-gray-50">
+                        <div class="m-2 text-xl">
+                            <InlineCheckboxes
+                                :items="overrides.arr"
+                                :form="overrides.form"
+                                @formChange="updateForm"
+                            />
+                        </div>
+                    </tr>
+                    <tr class="bg-white hover:bg-gray-50">
+                        <div class="m-2 text-xl">
+                            <InlineCheckboxes
+                                :items="overridesExtra.arr"
+                                :form="overridesExtra.form"
                                 @formChange="updateForm"
                             />
                         </div>

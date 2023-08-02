@@ -21,7 +21,7 @@ const userIdVal = ref(props.userId);
 
 watch(userIdVal, (newUser) => {
     router.get(
-        "/teacher/gradebook",
+        route("gradebook"),
         {
             userId: newUser,
             classId: props.classId,

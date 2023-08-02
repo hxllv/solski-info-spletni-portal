@@ -26,23 +26,21 @@ class TestController extends Controller
             return redirect('/teacher/');
         }
 
-        $students = SchoolClass::with('students')->find($data['classId'])->students;
-
         $classSubjectIds = SchoolClass::with('timetable_entries')->find($data['classId'])->timetable_entries->pluck('subject_teacher_id')->flatten();
         $teachersSubjectIds = auth()->user()->teacherOfPivot->pluck('id')->flatten();
 
         $subjects = SubjectTeacher::with('user')->find($classSubjectIds);
         $teachersSubjects = SubjectTeacher::with('user')->find($teachersSubjectIds);
 
-        $testsInFuture = Test::where('school_class_id', $data['classId'])->where('date', '>=', date('Y-m-d'))->with('subject_teacher')->orderBy('date', 'desc')->get()->groupBy('date');
-        $testsInPast = Test::where('school_class_id', $data['classId'])->where('date', '<', date('Y-m-d'))->with('subject_teacher')->orderBy('date', 'asc')->get()->groupBy('date');
+        $testsInFuture = Test::where('school_class_id', $data['classId'])->where('date', '>=', date('Y-m-d'))->with('subject_teacher')->orderBy('date', 'asc')->get()->groupBy('date');
+        $testsInPast = Test::where('school_class_id', $data['classId'])->where('date', '<', date('Y-m-d'))->with('subject_teacher')->orderBy('date', 'desc')->get()->groupBy('date');
 
         $permissions = auth()->user()->role->permissions->pluck('name')->toArray();
 
         if (auth()->user()->is_account_owner) 
             $permissions = Permission::all()->pluck('name')->toArray();
 
-        if (in_array('tests.bypass', $permissions) || auth()->user()->is_account_owner) {
+        if (in_array('tests.bypass', $permissions)) {
             $teachersSubjectIds = $classSubjectIds;
             $teachersSubjects = $subjects;
         }
@@ -52,7 +50,6 @@ class TestController extends Controller
             'subjects' => $subjects,
             'testsInFuture' => $testsInFuture,
             'testsInPast' => $testsInPast,
-            'students' => $students,
             'teachersSubjectIds' => $teachersSubjectIds,
             'teachersSubjects' => $teachersSubjects,
             'classId' => $data['classId'],
@@ -72,7 +69,7 @@ class TestController extends Controller
             'note' => 'string|nullable',
         ]);
 
-        $this->authorize('canFor', [Test::class, $data['subject']]);
+        $this->authorize('canForSubject', [Test::class, $data['subject']]);
 
         DB::transaction(function () use ($data) {
             return tap(SchoolClass::find($data['classId'])->tests()->create([
@@ -94,7 +91,7 @@ class TestController extends Controller
             'note' => 'string|nullable',
         ]);
 
-        $this->authorize('canFor', [Test::class, $test->subject_teacher_id]);
+        $this->authorize('canForSubject', [Test::class, $test->subject_teacher_id]);
 
         $test->forceFill([
             'date' => $data['date'],
@@ -106,7 +103,7 @@ class TestController extends Controller
     {
         $this->authorize('delete', Test::class);
 
-        $this->authorize('canFor', [Test::class, $test->subject_teacher_id]);
+        $this->authorize('canForSubject', [Test::class, $test->subject_teacher_id]);
 
         $test->delete();
     }

@@ -34,6 +34,21 @@ class DatabaseSeeder extends Seeder
             'name' => 'Starš',
         ]);
 
+        \App\Models\Permission::factory()->hasAttached([$admin, $classTeacher, $teacher, $student, $parent])->createMany([
+            ['name' => 'dashboard.view'],
+            ['name' => 'dashboard.timetable.view'],
+        ]);
+        \App\Models\Permission::factory()->hasAttached([$admin, $classTeacher, $teacher, $student])->createMany([
+            ['name' => 'dashboard.me.view'],
+        ]);
+        \App\Models\Permission::factory()->hasAttached([$parent])->createMany([
+            ['name' => 'dashboard.children.view'],
+            ['name' => 'dashboard.absences.edit'],
+        ]);
+        \App\Models\Permission::factory()->hasAttached([$parent, $student])->createMany([
+            ['name' => 'dashboard.absences.view'],
+            ['name' => 'dashboard.gradebook.view'],
+        ]);
         \App\Models\Permission::factory()->hasAttached([$admin, $classTeacher, $teacher])->createMany([
             ['name' => 'teacher.panel.view'],
             ['name' => 'admin.panel.view'],
@@ -58,6 +73,11 @@ class DatabaseSeeder extends Seeder
             ['name' => 'roles.view'],
             ['name' => 'absences.edit'],
             ['name' => 'absences.approval'],
+            ['name' => 'timetable.override.view'],
+            ['name' => 'timetable.override.create'],
+            ['name' => 'timetable.override.edit'],
+            ['name' => 'timetable.override.delete'],
+            ['name' => 'timetable.override.bypass'],
         ]);
         \App\Models\Permission::factory()->hasAttached($admin)->createMany([
             ['name' => 'all.classes.view'],
@@ -76,8 +96,10 @@ class DatabaseSeeder extends Seeder
             ['name' => 'settings.edit'],
             ['name' => 'settings.view'],
             ['name' => 'gradebook.bypass'],
-            ['name' => 'absences.bypass'],
+            ['name' => 'absences.bypass.subject'],
+            ['name' => 'absences.bypass.class'],
             ['name' => 'tests.bypass'],
+            ['name' => 'dashboard.all.view'],
         ]);
 
         $adminUser = \App\Models\User::factory()->for($admin)->create([
@@ -86,7 +108,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'nace.tavcer20@gmail.com',
         ]);
 
-        $t1 = \App\Models\User::factory()->for($teacher)->create([
+        $t1 = \App\Models\User::factory()->for($classTeacher)->create([
             'name' => 'Luka',
             'surname' => 'Tavcer',
             'email' => 'nace.tavcer@gmail.com',
@@ -114,7 +136,7 @@ class DatabaseSeeder extends Seeder
             ['is_account_owner' => false],
         ]);
 
-        $class = \App\Models\SchoolClass::factory()->for($adminUser, 'classTeacher')->create([
+        $class = \App\Models\SchoolClass::factory()->for($t1, 'classTeacher')->create([
             'name' => 'R1a',
         ]);
 

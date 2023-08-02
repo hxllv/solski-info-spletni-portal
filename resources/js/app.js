@@ -18,7 +18,8 @@ library.add(
     all.faInfoCircle,
     all.faThumbsUp,
     all.faThumbsDown,
-    all.faQuestion
+    all.faQuestion,
+    all.faArrowRight
 );
 
 const appName =

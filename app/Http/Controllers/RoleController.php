@@ -49,13 +49,19 @@ class RoleController extends Controller
             'absences.create',
             'absences.edit',
             'absences.delete',
-            'absences.bypass',
+            'absences.bypass.subject',
+            'absences.bypass.class',
             'absences.approval',
             'tests.view',
             'tests.create',
             'tests.edit',
             'tests.delete',
             'tests.bypass',
+            'timetable.override.view',
+            'timetable.override.create',
+            'timetable.override.edit',
+            'timetable.override.delete',
+            'timetable.override.bypass',
         ];
     }
 

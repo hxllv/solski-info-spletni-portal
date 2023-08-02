@@ -53,9 +53,9 @@ class AbsencePolicy
             Response::denyWithStatus(403);
     }
 
-    public function canFor(User $user, $subjectId): Response
+    public function canForSubject(User $user, $subjectId): Response
     {
-        if ($user->role->permissions->find('absences.bypass') || $user->is_account_owner)
+        if ($user->role->permissions->find('absences.bypass.subject') || $user->is_account_owner)
             return Response::allow();
 
         if (SubjectTeacher::find($subjectId)->user_id != $user->id)
@@ -66,7 +66,7 @@ class AbsencePolicy
 
     public function canForClass(User $user, $classId): Response
     {
-        if ($user->role->permissions->find('absences.bypass') || $user->is_account_owner)
+        if ($user->role->permissions->find('absences.bypass.class') || $user->is_account_owner)
             return Response::allow();
 
         if (SchoolClass::find($classId)->user_id != $user->id)

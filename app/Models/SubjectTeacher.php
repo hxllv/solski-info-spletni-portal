@@ -23,7 +23,6 @@ class SubjectTeacher extends Model
         return $this->user->full_name;
     }
 
-
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -52,6 +51,11 @@ class SubjectTeacher extends Model
     public function tests()
     {
         return $this->hasMany(Test::class, 'subject_teacher_id');
+    }
+
+    public function overrides()
+    {
+        return $this->hasMany(TimetableEntryOverride::class, 'subject_teacher_id');
     }
 }
 

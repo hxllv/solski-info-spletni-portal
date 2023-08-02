@@ -151,16 +151,18 @@ const approvalUpdate = (id, status) => {
             <table class="table-fixed mt-0 col-span-3">
                 <thead>
                     <tr
-                        class="text-xs text-left text-gray-700 uppercase bg-gray-50 grid grid-cols-4"
+                        class="text-xs text-left text-gray-700 uppercase bg-gray-50 grid grid-cols-4 break-words"
                     >
-                        <th class="px-6 py-3 border-r col-span-1">Datum</th>
-                        <th class="px-6 py-3 border-r col-span-1">
+                        <th class="px-2 md:px-6 py-3 border-r col-span-1">
+                            Datum
+                        </th>
+                        <th class="px-2 md:px-6 py-3 border-r col-span-1">
                             Št. odprtih
                         </th>
-                        <th class="px-6 py-3 border-r col-span-1">
+                        <th class="px-2 md:px-6 py-3 border-r col-span-1">
                             Št. opravičenih
                         </th>
-                        <th class="px-6 py-3 border-r col-span-1">
+                        <th class="px-2 md:px-6 py-3 border-r col-span-1">
                             Št. neopravičenih
                         </th>
                     </tr>
@@ -290,7 +292,8 @@ const approvalUpdate = (id, status) => {
                             class="bg-white border-b hover:bg-gray-100"
                         >
                             <td class="px-6 py-4 border-r">
-                                {{ absence.subject_teacher.name }}
+                                {{ absence.subject_teacher.name }} -
+                                {{ absence.subject_teacher.users_full_name }}
                             </td>
                             <td class="px-6 py-4 border-r">
                                 {{ absence.hour_name }}
@@ -346,7 +349,12 @@ const approvalUpdate = (id, status) => {
                                     <a
                                         class="cursor-pointer"
                                         @click="openDeleteModal(absence)"
-                                        v-if="allowDelete"
+                                        v-if="
+                                            allowDelete &&
+                                            allowActionsFor.includes(
+                                                absence.subject_teacher_id
+                                            )
+                                        "
                                     >
                                         <font-awesome-icon
                                             icon="fa-solid fa-trash-can"

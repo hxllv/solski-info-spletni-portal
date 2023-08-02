@@ -47,7 +47,7 @@ class GradebookController extends Controller
         if (auth()->user()->is_account_owner) 
             $permissions = Permission::all()->pluck('name')->toArray();
 
-        if (in_array('gradebook.bypass', $permissions) || auth()->user()->is_account_owner)
+        if (in_array('gradebook.bypass', $permissions))
             $teachersSubjects = $classSubjectIds;
 
         return Inertia::render('Teacher/Gradebook', 
@@ -74,7 +74,7 @@ class GradebookController extends Controller
             'note' => 'string|nullable',
         ]);
 
-        $this->authorize('canFor', [Gradebook::class, $data['subject']]);
+        $this->authorize('canForSubject', [Gradebook::class, $data['subject']]);
 
         DB::transaction(function () use ($data) {
             return tap(User::find($data['user'])->grades()->create([
@@ -96,7 +96,7 @@ class GradebookController extends Controller
             'note' => 'string|nullable',
         ]);
 
-        $this->authorize('canFor', [Gradebook::class, $grade->subject_teacher->id]);
+        $this->authorize('canForSubject', [Gradebook::class, $grade->subject_teacher->id]);
 
         $grade->forceFill([
             'grade' => $data['grade'],
@@ -108,7 +108,7 @@ class GradebookController extends Controller
     {
         $this->authorize('delete', Gradebook::class);
 
-        $this->authorize('canFor', [Gradebook::class, $grade->subject_teacher->id]);
+        $this->authorize('canForSubject', [Gradebook::class, $grade->subject_teacher->id]);
 
         $grade->delete();
     }

@@ -46,7 +46,7 @@ formFilterAdding.term = props.params.term;
 
 watch(userIdVal, (newUser) => {
     router.get(
-        "/teacher/absences",
+        route("absences"),
         {
             userId: newUser,
             classId: props.classId,
@@ -62,7 +62,7 @@ watch(forDateVal, (newDate) => {
     hourAndSubject.value = "";
 
     router.get(
-        "/teacher/absences",
+        route("absences"),
         {
             userId: userIdVal.value,
             classId: props.classId,
@@ -79,7 +79,7 @@ watch(hourAndSubject, (newHour) => {
     if (!newHour) return;
 
     router.get(
-        "/teacher/absences",
+        route("absences"),
         {
             userId: userIdVal.value,
             classId: props.classId,
@@ -109,6 +109,7 @@ const closeAddingModal = () => {
     selectedUsersAdding.value = false;
     hourAndSubject.value = "";
     multiActionsAddingClass.value = "opacity-30 pointer-events-none";
+    forDateVal.value = new Date().toISOString().split("T")[0];
 
     formFilterAdding.reset();
 
@@ -156,7 +157,10 @@ const addAbsences = () => {
         v-slot="layout"
     >
         <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
-            <div class="md:grid md:grid-cols-4 md:gap-2">
+            <div
+                class="md:grid md:grid-cols-4 md:gap-2"
+                v-if="permission.includes('absences.create')"
+            >
                 <div class="mt-5 md:mt-0 md:col-span-1">
                     <PrimaryButton @click="openAddingModal">
                         Dodaj izostanek
@@ -182,13 +186,15 @@ const addAbsences = () => {
                 :absences="absences"
                 :userId="userId"
                 :classId="classId"
-                :allowEdit="permission.includes('absences.edit')"
+                :allowEdit="
+                    permission.includes('absences.edit') &&
+                    classTeacherClassIds.includes(classId)
+                "
                 :allowDelete="permission.includes('absences.delete')"
                 :allowActionsFor="teachersSubjects"
                 :allowApproval="
                     permission.includes('absences.approval') &&
-                    (classTeacherClassIds.includes(classId) ||
-                        permission.includes('absences.bypass'))
+                    classTeacherClassIds.includes(classId)
                 "
                 :buffer="layout.buffer"
             />
@@ -225,11 +231,25 @@ const addAbsences = () => {
                                         :value="
                                             JSON.stringify([
                                                 avail.hour,
-                                                avail.subject_teacher_id,
+                                                avail.override
+                                                    ? avail.override.id
+                                                    : avail.subject_teacher_id,
                                             ])
                                         "
                                     >
-                                        {{ avail.subject_teacher.name }} -
+                                        {{
+                                            avail.override
+                                                ? avail.override.name
+                                                : avail.subject_teacher.name
+                                        }}
+                                        -
+                                        {{
+                                            avail.override
+                                                ? avail.override.users_full_name
+                                                : avail.subject_teacher
+                                                      .users_full_name
+                                        }}
+                                        -
                                         {{ avail.hour_name }}
                                     </option>
                                 </Select>
@@ -308,6 +328,7 @@ const addAbsences = () => {
             </template>
 
             <template #footer>
+                <InputError :message="formAdd.errors.extra" class="mt-2" />
                 <SecondaryButton @click="closeAddingModal">
                     Prekliči
                 </SecondaryButton>

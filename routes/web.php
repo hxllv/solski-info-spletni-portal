@@ -11,8 +11,10 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GradebookController;
 use App\Http\Controllers\TestController;
+use App\Http\Controllers\TimetableEntryOverrideController;
 use App\Models\Permission;
 use App\Models\SchoolClass;
+use App\Models\TimetableEntryOverride;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -97,6 +99,11 @@ Route::middleware([
         Route::post('/tests', [TestController::class, 'store'])->name('create.tests');
         Route::delete('/tests/{test}', [TestController::class, 'destroy'])->name('tests.delete');
         Route::put('/tests/{test}', [TestController::class, 'update'])->name('tests.update');
+
+        Route::get('/overrides', [TimetableEntryOverrideController::class, 'index'])->name('overrides');
+        Route::post('/overrides', [TimetableEntryOverrideController::class, 'store'])->name('create.overrides');
+        Route::delete('/overrides/{override}', [TimetableEntryOverrideController::class, 'destroy'])->name('overrides.delete');
+        Route::put('/overrides/{override}', [TimetableEntryOverrideController::class, 'update'])->name('overrides.update');
     });
 
     Route::prefix('admin')->group(function () {

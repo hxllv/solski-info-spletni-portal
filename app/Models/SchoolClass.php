@@ -37,4 +37,9 @@ class SchoolClass extends Model
     {
         return $this->hasMany(Test::class, 'school_class_id');
     }
+
+    public function overrides()
+    {
+        return $this->hasMany(TimetableEntryOverride::class, 'school_class_id');
+    }
 }

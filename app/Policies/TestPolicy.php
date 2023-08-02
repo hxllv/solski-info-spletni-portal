@@ -52,7 +52,7 @@ class TestPolicy
             Response::denyWithStatus(403);
     }
 
-    public function canFor(User $user, $subjectId): Response
+    public function canForSubject(User $user, $subjectId): Response
     {
         if ($user->role->permissions->find('tests.bypass') || $user->is_account_owner)
             return Response::allow();

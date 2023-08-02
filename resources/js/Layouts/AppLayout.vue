@@ -63,7 +63,22 @@ const adminRoute = ref(getAdminRoute());
                                     Namizje
                                 </NavLink>
                             </div>
-
+                            <div
+                                class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex"
+                                v-if="permission.includes('teacher.panel.view')"
+                            >
+                                <NavLink
+                                    :href="route('teacher')"
+                                    :active="
+                                        route().current('teacher') ||
+                                        route().current('gradebook') ||
+                                        route().current('absences') ||
+                                        route().current('tests')
+                                    "
+                                >
+                                    Učitelji
+                                </NavLink>
+                            </div>
                             <div
                                 class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex"
                                 v-if="permission.includes('admin.panel.view')"
@@ -82,23 +97,6 @@ const adminRoute = ref(getAdminRoute());
                                     "
                                 >
                                     Admini
-                                </NavLink>
-                            </div>
-
-                            <div
-                                class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex"
-                                v-if="permission.includes('teacher.panel.view')"
-                            >
-                                <NavLink
-                                    :href="route('teacher')"
-                                    :active="
-                                        route().current('teacher') ||
-                                        route().current('gradebook') ||
-                                        route().current('absences') ||
-                                        route().current('tests')
-                                    "
-                                >
-                                    Učitelji
                                 </NavLink>
                             </div>
                         </div>

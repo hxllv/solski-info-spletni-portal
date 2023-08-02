@@ -11,6 +11,7 @@ import Select from "@/Components/Select.vue";
 
 const props = defineProps({
     data: Array,
+    overrides: Array,
     subjects: Array,
     hours: Object,
     classId: Number,
@@ -42,10 +43,6 @@ const refreshTimetable = () => {
     itemData.value = {};
 
     props.data.forEach((value) => {
-        const tempUser = props.subjects.filter(
-            (sub) => value.subject_teacher.user_id == sub.user.id
-        )[0].user;
-
         let className;
         if (value.school_class) {
             className = value.school_class.name;
@@ -53,7 +50,25 @@ const refreshTimetable = () => {
 
         itemData.value[`${Number(value.hour)}-${value.day}`] = {
             subject: value.subject_teacher.name,
-            fullname: tempUser.full_name,
+            fullname: value.subject_teacher.users_full_name,
+            className: className,
+            id: value.id,
+        };
+    });
+
+    if (!props.overrides) return;
+
+    props.overrides.forEach((value) => {
+        let className;
+        if (value.school_class) {
+            className = value.school_class.name;
+        }
+
+        itemData.value[`${Number(value.hour)}-${value.day}`] = {
+            subject: value.subject_teacher ? value.subject_teacher.name : "",
+            fullname: value.subject_teacher
+                ? value.subject_teacher.users_full_name
+                : "",
             className: className,
             id: value.id,
         };
@@ -107,7 +122,10 @@ const removeTimetableEntry = (id) => {
     <div class="relative">
         <Spinner :buffer="buffer" />
 
-        <div class="overflow-x-auto grid grid-cols-3 sm:rounded-t-md shadow">
+        <div
+            class="overflow-x-auto grid grid-cols-3 sm:rounded-md shadow"
+            v-if="(data && data.length) || allowEdit"
+        >
             <table class="table-auto mt-0 col-span-3">
                 <thead
                     class="text-xs text-left text-gray-700 uppercase bg-gray-50"

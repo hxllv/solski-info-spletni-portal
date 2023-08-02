@@ -29,7 +29,7 @@ router.on("finish", () => {
 
 watch(classId, (newId) => {
     router.get(
-        "/teacher",
+        route().current(),
         {
             classId: newId,
         },
@@ -75,6 +75,17 @@ watch(classId, (newId) => {
                     :active="route().current('tests')"
                 >
                     Ocenjevanja
+                </Tab>
+            </li>
+            <li
+                class="mr-2"
+                v-if="permission.includes('timetable.override.view')"
+            >
+                <Tab
+                    :href="route('overrides', { classId: classId })"
+                    :active="route().current('overrides')"
+                >
+                    Nadomeščanja
                 </Tab>
             </li>
         </ul>

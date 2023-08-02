@@ -83,7 +83,7 @@ class UserController extends Controller
 
         // children
 
-        $mQuery = $user->parentOf();
+        $mQuery = $user->children();
 
         $data['term'] = $data['term'] ?? '';
         $data['role'] = $data['role'] ?? '';
@@ -120,7 +120,7 @@ class UserController extends Controller
         // exclude already children and viewing user
 
         $filteredUsers = $nQuery->get()->pluck('id')->toArray();
-        $children = $user->parentOf->pluck('id')->toArray();
+        $children = $user->children->pluck('id')->toArray();
 
         $potentialChildren = User::whereIn('id', array_diff($filteredUsers, $children, [$user->id]));
 
@@ -216,10 +216,10 @@ class UserController extends Controller
             $userIds = $users->pluck('id')->toArray();
 
             if ($data['parent'] < 0) {
-                $parentCorrected->parentOf()->detach($userIds);
+                $parentCorrected->children()->detach($userIds);
                 return;
             }
-            $parentCorrected->parentOf()->sync($userIds, false);
+            $parentCorrected->children()->sync($userIds, false);
         }
     }
 

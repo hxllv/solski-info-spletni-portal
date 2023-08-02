@@ -145,6 +145,8 @@ const editGrade = () => {
 const subjectsWithGrades = computed(() => {
     let newSubjects = JSON.parse(JSON.stringify(props.subjects));
 
+    if (!newSubjects) return;
+
     newSubjects.forEach((subject) => {
         subject.grades = [];
 
@@ -171,11 +173,11 @@ const subjectsWithGrades = computed(() => {
                 <tbody class="text-xs md:text-sm lg:text-base">
                     <tr
                         v-for="subject in subjectsWithGrades"
-                        class="bg-white border-b hover:bg-gray-100 grid grid-cols-4"
+                        class="bg-white border-b hover:bg-gray-100 grid grid-cols-4 break-words"
                     >
                         <td class="p-3 border-r text-center col-span-1">
                             <div>{{ subject.name }}</div>
-                            <div class="text-sm text-gray-600">
+                            <div class="text-xs md:text-sm text-gray-600">
                                 {{ subject.user.full_name }}
                             </div>
                         </td>
