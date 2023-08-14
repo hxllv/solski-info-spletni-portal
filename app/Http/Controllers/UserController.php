@@ -99,7 +99,7 @@ class UserController extends Controller
 
         // parents
 
-        $parents = $user->parent;
+        $parents = $user->parents;
 
         // potential children
 

@@ -101,18 +101,20 @@ const onSelectChange = (val) => {
 const dissociateUsers = () => {
     formDissociate.transform(() => ({
         userIds: selectedUsers.value,
-        parent: -1
+        parent: -props.user.id
     })).put(route('multi.user.update'), {
         preserveScroll: true,
     });
 };
+
+console.log(props)
 </script>
 
 <template>
     <AdminLayout :title="`Otroci/starši uporabnika ${user.name} ${user.surname} - ${user.email}`" :backButtonURL="route('users')" v-slot="layout" :permission="permission">
         <div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
             <div>
-                <h2 v-if="parents.length" class="pb-6 px-2 text-xl text-gray-800 leading-tight">
+                <h2 v-if="parents && parents.length" class="pb-6 px-2 text-xl text-gray-800 leading-tight">
                     Starši:
                     <div v-for="parent in parents" class="pt-2">
                         <Link :href="route('view.user', parent.id)" class="text-blue-600 dark:text-blue-500 hover:underline">
