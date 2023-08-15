@@ -18,7 +18,6 @@ const props = defineProps({
     allTimetableEntries: Object,
     overridesInFuture: Object,
     overridesInPast: Object,
-    teachersSubjects: Array,
     classTeacherClassIds: Array,
     classId: String,
     forDate: String,
@@ -109,7 +108,6 @@ console.log(props);
                 :entries="allTimetableEntries"
                 :allowEdit="permission.includes('timetable.override.edit')"
                 :allowDelete="permission.includes('timetable.override.delete')"
-                :allowActionsFor="teachersSubjects"
                 :buffer="layout.buffer"
             />
 
@@ -120,7 +118,6 @@ console.log(props);
                 :entries="allTimetableEntries"
                 :allowEdit="permission.includes('timetable.override.edit')"
                 :allowDelete="permission.includes('timetable.override.delete')"
-                :allowActionsFor="teachersSubjects"
                 :buffer="layout.buffer"
             />
         </div>

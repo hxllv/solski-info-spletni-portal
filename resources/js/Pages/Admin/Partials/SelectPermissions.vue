@@ -75,6 +75,13 @@ const gradebookDash = {
     },
 };
 
+const testsDash = {
+    arr: [{ name: "Pogled", id: "dashboard.tests.view" }],
+    form: {
+        ...inclds("dashboard.tests.view"),
+    },
+};
+
 // teacher panel
 
 const gradebook = {
@@ -401,6 +408,20 @@ const settings = {
                             <InlineCheckboxes
                                 :items="absencesDash.arr"
                                 :form="absencesDash.form"
+                                @formChange="updateForm"
+                            />
+                        </div>
+                    </tr>
+                </table>
+                <h1 class="font-semibold text-gray-900 text-lg m-2">
+                    Ocenjevanja
+                </h1>
+                <table class="w-full">
+                    <tr class="bg-white hover:bg-gray-50">
+                        <div class="m-2 text-xl">
+                            <InlineCheckboxes
+                                :items="testsDash.arr"
+                                :form="testsDash.form"
                                 @formChange="updateForm"
                             />
                         </div>

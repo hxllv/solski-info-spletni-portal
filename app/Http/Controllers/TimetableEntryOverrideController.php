@@ -31,8 +31,6 @@ class TimetableEntryOverrideController extends Controller
 
         $dayOfWeek = date('w', strtotime($data['forDate'])) - 1;
 
-        $teachersSubjects = SchoolClass::find($data['classId'])->timetable_entries->pluck('subject_teacher_id')->flatten();
-
         $hoursAlreadyOverriden = TimetableEntryOverride::where('date', $data['forDate'])->get()->pluck('hour')->flatten();
 
         $todaysEntries = TimetableEntry::where('day', $dayOfWeek)->where('school_class_id', $data['classId'])
@@ -62,7 +60,6 @@ class TimetableEntryOverrideController extends Controller
             'allTimetableEntries' => $allTimetableEntries,
             'overridesInFuture' => $overridesInFuture,
             'overridesInPast' => $overridesInPast,
-            'teachersSubjects' => $teachersSubjects,
             'classId' => $data['classId'],
             'classTeacherClassIds' => $classTeacherClassIds,
             'forDate' => $data['forDate'],

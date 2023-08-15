@@ -146,6 +146,8 @@ const addAbsences = () => {
             onError: () => {},
         });
 };
+
+console.log(props);
 </script>
 
 <template>
@@ -188,13 +190,15 @@ const addAbsences = () => {
                 :classId="classId"
                 :allowEdit="
                     permission.includes('absences.edit') &&
-                    classTeacherClassIds.includes(classId)
+                    (classTeacherClassIds.includes(Number(classId)) ||
+                        permission.includes('absences.bypass.class'))
                 "
                 :allowDelete="permission.includes('absences.delete')"
                 :allowActionsFor="teachersSubjects"
-                :allowApproval="
-                    permission.includes('absences.approval') &&
-                    classTeacherClassIds.includes(classId)
+                :allowApproval="permission.includes('absences.approval')"
+                :isClassTeacher="
+                    classTeacherClassIds.includes(Number(classId)) ||
+                    permission.includes('absences.bypass.class')
                 "
                 :buffer="layout.buffer"
             />

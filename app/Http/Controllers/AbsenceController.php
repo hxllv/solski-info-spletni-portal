@@ -187,7 +187,7 @@ class AbsenceController extends Controller
 
     public function excuse(Absence $absence)
     {
-        $this->authorize('approval', Absence::class);
+        $this->authorize('edit', Absence::class);
 
         $data = request()->validate([
             'excuse' => 'string|required',

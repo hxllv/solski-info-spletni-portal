@@ -7,6 +7,7 @@ use App\Models\Permission;
 use App\Models\SchoolClass;
 use App\Models\Setting;
 use App\Models\SubjectTeacher;
+use App\Models\Test;
 use App\Models\TimetableEntry;
 use App\Models\TimetableEntryOverride;
 use App\Models\User;
@@ -45,6 +46,10 @@ class DashboardController extends Controller
             $users = User::all()->toArray();
 
         $user = User::find($data['userId']);
+
+        if (is_null($user)) {
+            $user = User::find($users[0]['id']);
+        }
 
         $userPerm = $user->role->permissions->pluck('name')->toArray();
 
@@ -89,6 +94,8 @@ class DashboardController extends Controller
 
         // absences
 
+        $absences = null;
+
         if (in_array('dashboard.absences.view', $permissions)) {
             $absences = Absence::where('user_id', $user->id)->with('subject_teacher')->orderBy('date', 'desc')->orderBy('hour', 'asc')->get()->groupBy('date');
         }
@@ -98,15 +105,22 @@ class DashboardController extends Controller
         $grades = null;
         $subjects = null;
 
-        if (in_array('dashboard.gradebook.view', $permissions)) {
-            if (!is_null($class)) {
-                $classSubjectIds = SchoolClass::with('timetable_entries')->find($class->id)->timetable_entries->pluck('subject_teacher_id')->flatten();
+        if (in_array('dashboard.gradebook.view', $permissions) && !is_null($class)) {
+            $classSubjectIds = SchoolClass::with('timetable_entries')->find($class->id)->timetable_entries->pluck('subject_teacher_id')->flatten();
 
-                $subjects = SubjectTeacher::with('user')->find($classSubjectIds);
-                $grades = SubjectTeacher::whereHas('grades', function($query) use ($user) {
-                    $query->where('user_id', $user->id);
-                })->with('grades')->find($classSubjectIds);
-            }
+            $subjects = SubjectTeacher::with('user')->find($classSubjectIds);
+            $grades = SubjectTeacher::whereHas('grades', function($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })->with('grades')->find($classSubjectIds);
+        }
+
+        // tests
+
+        $tests = null;
+
+        if (in_array('dashboard.tests.view', $permissions) && !is_null($class)) {
+            $tests = Test::where('school_class_id', $class->id)->where('date', '>=', date('Y-m-d'))->
+                with('subject_teacher')->orderBy('date', 'asc')->get()->groupBy('date');  
         }
 
         return Inertia::render('Dashboard', 
@@ -116,12 +130,27 @@ class DashboardController extends Controller
                 'timetableOverrides' => $timetableOverrides,
                 'absences' => $absences,
                 'grades' => $grades,
+                'tests' => $tests,
                 'subjects' => $subjects,
                 'sClass' => $class,
                 'users' => $users,
                 'hours' => Setting::find('timetable.hours'),
-                'userId' => (string) $data['userId'],
-            ]
+                'userId' => (string) $user->id,
+            ] 
         );
+    }
+
+    public function excuse(Absence $absence)
+    {
+        $this->authorize('edit', Absence::class);
+
+        $data = request()->validate([
+            'excuse' => 'string|required',
+            'classId' => 'numeric|required|exists:school_classes,id',
+        ]);
+
+        $absence->forceFill([
+            'excuse' => $data['excuse'],
+        ])->save();
     }
 }

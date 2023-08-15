@@ -46,6 +46,7 @@ class Init extends Seeder
         \App\Models\Permission::factory()->hasAttached([$parent, $student])->createMany([
             ['name' => 'dashboard.absences.view'],
             ['name' => 'dashboard.gradebook.view'],
+            ['name' => 'dashboard.tests.view'],
         ]);
         \App\Models\Permission::factory()->hasAttached([$admin, $classTeacher, $teacher])->createMany([
             ['name' => 'teacher.panel.view'],
@@ -75,7 +76,6 @@ class Init extends Seeder
             ['name' => 'timetable.override.create'],
             ['name' => 'timetable.override.edit'],
             ['name' => 'timetable.override.delete'],
-            ['name' => 'timetable.override.bypass'],
         ]);
         \App\Models\Permission::factory()->hasAttached($admin)->createMany([
             ['name' => 'all.classes.view'],
@@ -97,6 +97,7 @@ class Init extends Seeder
             ['name' => 'absences.bypass.subject'],
             ['name' => 'absences.bypass.class'],
             ['name' => 'tests.bypass'],
+            ['name' => 'timetable.override.bypass'],
             ['name' => 'dashboard.all.view'],
         ]);
 

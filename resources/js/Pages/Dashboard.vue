@@ -3,6 +3,7 @@ import DashboardLayout from "@/Layouts/DashboardLayout.vue";
 import Timetable from "@/Components/Timetable.vue";
 import Absences from "@/Components/Absences.vue";
 import Gradebook from "@/Components/Gradebook.vue";
+import Tests from "@/Components/Tests.vue";
 
 const props = defineProps({
     permission: Array,
@@ -10,6 +11,7 @@ const props = defineProps({
     timetableOverrides: Array,
     absences: Object,
     grades: Object,
+    tests: Object,
     subjects: Object,
     sClass: Object,
     users: Array,
@@ -63,10 +65,26 @@ console.log(props);
                         permission.includes('dashboard.absences.view') && userId
                     "
                 >
+                    <div class="py-4 font-medium">Izostanki</div>
                     <Absences
                         :absences="absences"
+                        :allowEdit="
+                            permission.includes('dashboard.absences.edit')
+                        "
                         :userId="userId"
                         :classId="sClass ? String(sClass.id) : null"
+                        :buffer="layout.buffer"
+                        routeName="dashboard.excuse"
+                    />
+                </div>
+                <div
+                    class="pb-5"
+                    v-if="permission.includes('dashboard.tests.view') && userId"
+                >
+                    <div class="py-4 font-medium">Prihodnja ocenjevanja</div>
+                    <Tests
+                        :tests="tests"
+                        :allowEdit="permission.includes('tests.edit')"
                         :buffer="layout.buffer"
                     />
                 </div>

@@ -15,6 +15,7 @@ class RoleController extends Controller
 {
     readonly array $adminPanelSubPermissions;
     readonly array $teacherPanelSubPermissions;
+    readonly array $dashboardSubPermissions;
 
     public function __construct() {
         $this->adminPanelSubPermissions = [
@@ -62,6 +63,16 @@ class RoleController extends Controller
             'timetable.override.edit',
             'timetable.override.delete',
             'timetable.override.bypass',
+        ];
+        $this->dashboardSubPermissions = [
+            'dashboard.timetable.view',
+            'dashboard.absences.view',
+            'dashboard.absences.edit',
+            'dashboard.gradebook.view',
+            'dashboard.tests.view',
+            'dashboard.me.view',
+            'dashboard.children.view',
+            'dashboard.all.view'
         ];
     }
 
@@ -143,6 +154,10 @@ class RoleController extends Controller
         if (!$permissions['teacher.panel.view']) {
             $role->permissions()->detach('teacher.panel.view');
             $role->permissions()->detach($this->teacherPanelSubPermissions);
+        }
+        if (!$permissions['dashboard.view']) {
+            $role->permissions()->detach('dashboard.view');
+            $role->permissions()->detach($this->dashboardSubPermissions);
         }
 
         $role->save();

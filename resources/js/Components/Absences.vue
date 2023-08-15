@@ -31,7 +31,15 @@ const props = defineProps({
         type: Array,
         default: [],
     },
+    isClassTeacher: {
+        type: Boolean,
+        default: false,
+    },
     buffer: Boolean,
+    routeName: {
+        type: String,
+        default: "absences.excuse",
+    },
 });
 
 const absenceInfo = ref(false);
@@ -119,7 +127,7 @@ const editAbsence = () => {
             ...formEdit,
             classId: props.classId,
         }))
-        .put(route("absences.excuse", selectedAbsence.value.id), {
+        .put(route(props.routeName, selectedAbsence.value.id), {
             preserveScroll: true,
             onSuccess: () => closeEditModal(),
         });
@@ -309,7 +317,7 @@ const approvalUpdate = (id, status) => {
                                     <a
                                         class="cursor-pointer"
                                         @click="approvalUpdate(absence.id, 0)"
-                                        v-if="allowApproval"
+                                        v-if="allowApproval && isClassTeacher"
                                     >
                                         <font-awesome-icon
                                             icon="fa-solid fa-question"
@@ -319,7 +327,7 @@ const approvalUpdate = (id, status) => {
                                     <a
                                         class="cursor-pointer"
                                         @click="approvalUpdate(absence.id, 1)"
-                                        v-if="allowApproval"
+                                        v-if="allowApproval && isClassTeacher"
                                     >
                                         <font-awesome-icon
                                             icon="fa-solid fa-thumbs-up"
@@ -329,7 +337,7 @@ const approvalUpdate = (id, status) => {
                                     <a
                                         class="cursor-pointer"
                                         @click="approvalUpdate(absence.id, 2)"
-                                        v-if="allowApproval"
+                                        v-if="allowApproval && isClassTeacher"
                                     >
                                         <font-awesome-icon
                                             icon="fa-solid fa-thumbs-down"
@@ -351,9 +359,10 @@ const approvalUpdate = (id, status) => {
                                         @click="openDeleteModal(absence)"
                                         v-if="
                                             allowDelete &&
-                                            allowActionsFor.includes(
+                                            (allowActionsFor.includes(
                                                 absence.subject_teacher_id
-                                            )
+                                            ) ||
+                                                isClassTeacher)
                                         "
                                     >
                                         <font-awesome-icon

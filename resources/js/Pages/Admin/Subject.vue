@@ -134,11 +134,15 @@ const usersMod = computed(() => {
     let newUsers = JSON.parse(JSON.stringify(props.users));
 
     newUsers.data.forEach((user) => {
-        user.custom = user.pivot.name;
+        user.custom = user.pivot.custom_name
+            ? user.pivot.custom_name
+            : props.subject.name;
     });
 
     return newUsers;
 });
+
+console.log(props);
 </script>
 
 <template>

@@ -34,7 +34,7 @@ class AbsencePolicy
 
     public function edit(User $user): Response
     {
-        return ($user->role->permissions->find('absences.edit') || $user->is_account_owner) ? 
+        return ($user->role->permissions->find('absences.edit') || $user->role->permissions->find('dashboard.absences.edit') || $user->is_account_owner) ? 
             Response::allow() : 
             Response::denyWithStatus(403);
     }

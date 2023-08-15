@@ -22,10 +22,6 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
-    allowActionsFor: {
-        type: Array,
-        default: [],
-    },
     buffer: Boolean,
 });
 
@@ -222,7 +218,10 @@ const editOverride = () => {
                 </li>
             </ul>
             <div class="py-4 font-medium">Nadomestni predmet</div>
-            <ul class="list-disc py-2 pl-4">
+            <ul
+                class="list-disc py-2 pl-4"
+                v-if="selectedOverride.override.subject_teacher"
+            >
                 <li>
                     Predmet:
                     {{ selectedOverride.override.subject_teacher.name }}
@@ -238,30 +237,19 @@ const editOverride = () => {
                     Opombe: {{ selectedOverride.override.note }}
                 </li>
             </ul>
+            <ul class="list-disc py-2 pl-4" v-else>
+                <li>Predmet: Prosta ura</li>
+                <li v-if="selectedOverride.override.note">
+                    Opombe: {{ selectedOverride.override.note }}
+                </li>
+            </ul>
         </template>
 
         <template #footer>
-            <DangerButton
-                v-if="
-                    allowDelete &&
-                    allowActionsFor.includes(
-                        selectedOverride.override.subject_teacher_id
-                    )
-                "
-                @click="openDeleteModal"
-            >
+            <DangerButton v-if="allowDelete" @click="openDeleteModal">
                 Izbriši
             </DangerButton>
-            <PrimaryButton
-                v-if="
-                    allowEdit &&
-                    allowActionsFor.includes(
-                        selectedOverride.override.subject_teacher_id
-                    )
-                "
-                class="ml-3"
-                @click="openEditModal"
-            >
+            <PrimaryButton v-if="allowEdit" class="ml-3" @click="openEditModal">
                 Uredi
             </PrimaryButton>
             <SecondaryButton class="ml-3" @click="closeInfoModal">

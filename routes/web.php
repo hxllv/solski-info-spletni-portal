@@ -60,6 +60,7 @@ Route::middleware([
 ])->group(function () {
     Route::prefix('dashboard')->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+        Route::put('/excuse/{absence}', [DashboardController::class, 'excuse'])->name('dashboard.excuse');
     });
 
     Route::prefix('teacher')->group(function () {
