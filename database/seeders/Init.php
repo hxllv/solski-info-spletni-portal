@@ -78,7 +78,6 @@ class Init extends Seeder
             ['name' => 'timetable.override.delete'],
         ]);
         \App\Models\Permission::factory()->hasAttached($admin)->createMany([
-            ['name' => 'all.classes.view'],
             ['name' => 'users.edit'],
             ['name' => 'users.delete'],
             ['name' => 'roles.create'],

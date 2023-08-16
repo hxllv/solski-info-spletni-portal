@@ -141,7 +141,7 @@ class DashboardController extends Controller
 
     public function excuse(Absence $absence)
     {
-        $this->authorize('edit', Absence::class);
+        $this->authorize('editOnDashboard', Absence::class);
 
         $data = request()->validate([
             'excuse' => 'string|required',
