@@ -36,6 +36,7 @@ console.log(props);
                     class="pb-5"
                     v-if="permission.includes('dashboard.timetable.view')"
                 >
+                    <div class="py-4 font-medium">Urnik</div>
                     <Timetable
                         :classId="sClass ? sClass.id : null"
                         :data="timetableEntries"
@@ -52,6 +53,7 @@ console.log(props);
                         userId
                     "
                 >
+                    <div class="py-4 font-medium">Redovalnica</div>
                     <Gradebook
                         :grades="grades"
                         :subjects="subjects"

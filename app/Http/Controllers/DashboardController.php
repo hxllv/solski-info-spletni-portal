@@ -30,26 +30,25 @@ class DashboardController extends Controller
 
         // users
 
-        $users = [];
+        $users = collect();
+
+        //dd(auth()->user());
 
         if (in_array('dashboard.children.view', $permissions))
-            $users = auth()->user()->children->toArray();
+            $users = auth()->user()->children;
 
-        if (in_array('dashboard.me.view', $permissions)){
-            array_push($users, auth()->user());
-
-            if (is_null($data['userId']))
-                $data['userId'] = auth()->user()->id;
-        }
+        if (in_array('dashboard.me.view', $permissions))
+            $users->push(User::find(auth()->user()->id));
 
         if (in_array('dashboard.all.view', $permissions))
-            $users = User::all()->toArray();
+            $users = User::all();
 
         $user = User::find($data['userId']);
 
-        if (is_null($user)) {
-            $user = User::find($users[0]['id']);
-        }
+        if (is_null($user))
+            $user = User::find($users[0]->id);
+
+        $this->authorize('canViewUser', [User::class, $user->id]);
 
         $userPerm = $user->role->permissions->pluck('name')->toArray();
 
